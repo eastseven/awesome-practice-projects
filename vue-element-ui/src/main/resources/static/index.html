@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ZH">
+<head>
+    <meta charset="UTF-8">
+    <title>spring boot + mybatis + vue + elementui</title>
+    <link rel="stylesheet" href="//cdn.bootcss.com/element-ui/1.1.2/theme-default/index.css">
+    <script src="//cdn.bootcss.com/vue/2.1.8/vue.min.js"></script>
+    <script src="//cdn.bootcss.com/element-ui/1.1.2/index.js"></script>
+    <script src="//cdn.bootcss.com/vue-resource/1.0.3/vue-resource.min.js"></script>
+</head>
+
+<body>
+<div id="vm">
+    <el-table :data="tableData" stripe style="width: 100%">
+        <el-table-column prop="id" label="id"></el-table-column>
+        <el-table-column prop="name" label="姓名"></el-table-column>
+    </el-table>
+
+</div>
+</body>
+<script type="text/javascript">
+    Vue.http.options.emulateJSON = true;
+    Vue.http.options.emulateHTTP = true;
+
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            tableData: [],
+            listLoading: false,
+            username: null
+        },
+        mounted: function () {
+            this.getUser();
+        },
+        methods: {
+
+            getUser: function () {
+                var params_ = {};
+                this.$http.get("/getGroup", {
+                    params: params_
+                }).then(function (response) {
+                    console.log(response.data);
+                    this.tableData = response.data.users
+                }).catch(function (response) {
+                });
+            }
+        }
+    })
+</script>
+</html>
