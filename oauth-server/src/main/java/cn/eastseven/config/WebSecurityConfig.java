@@ -18,27 +18,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired LoginSuccessHandler loginSuccessHandler;
 
+    @Autowired UserDetailsServiceImpl userDetailsService;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/login", "/webjars/")
-                .permitAll()
+                .antMatchers("/login", "/webjars/").permitAll()
             .and()
                 .formLogin()
                 .loginPage("/login")
-                .usernameParameter("email")
                 .successHandler(loginSuccessHandler)
                 .failureUrl("/login?error")
                 .permitAll()
             .and()
-                .csrf()
-                .disable();
+                .cors().disable()
+            //.and()
+                .csrf().disable()
+        ;
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication().withUser("admin@debug7.cn").password("123456").roles("ADMIN");
+        //auth.inMemoryAuthentication().withUser("admin@debug7.cn").password("123456").roles("ADMIN");
+        auth.userDetailsService(userDetailsService);
     }
 
 }

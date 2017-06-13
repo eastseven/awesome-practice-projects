@@ -1,5 +1,6 @@
 server:
   port: 7070
+  context-path: /api
 
 security:
   oauth2:
