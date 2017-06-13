@@ -1,0 +1,26 @@
+server:
+  port: 7073
+
+# JWT
+jwt:
+  header: Authorization
+  secret: mySecret
+  expiration: 604800
+  tokenHead: "Bearer "
+  route:
+    authentication:
+      path: auth
+      refresh: refresh
+      register: "auth/register"
+
+# Logging configuration
+logging:
+  level:
+    cn.eastseven: debug
+    org.springframework:
+      data: debug
+      security: debug
+
+spring:
+  jpa:
+    show-sql: true
