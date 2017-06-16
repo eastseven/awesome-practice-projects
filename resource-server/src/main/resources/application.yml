@@ -16,4 +16,3 @@ logging:
   level:
     cn.eastseven: debug
     org.springframework.security: debug
-
