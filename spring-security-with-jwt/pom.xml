@@ -70,6 +70,10 @@
             <artifactId>guava</artifactId>
             <version>19.0</version>
         </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
