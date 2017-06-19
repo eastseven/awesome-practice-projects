@@ -6,11 +6,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 /**
  * Created by dongqi on 17/5/25.
@@ -26,6 +26,9 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
 
     @Autowired
     MySecondFilter secondFilter;
+
+    @Autowired
+    JwtFilter jwtFilter;
 
     @Bean
     public FilterRegistrationBean filter1() {
@@ -43,14 +46,19 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter {
         return bean;
     }
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        super.configure(http);
-        // http.addFilterBefore(myFilter, OAuth2AuthenticationProcessingFilter.class);
+    @Bean
+    public FilterRegistrationBean filter3() {
+        log.debug(" ===== JWT Filter Register =====");
+        FilterRegistrationBean bean = new FilterRegistrationBean(jwtFilter);
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE + 2);
+        return bean;
     }
 
     @Override
-    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-        super.configure(resources);
+    public void configure(HttpSecurity http) throws Exception {
+        // super.configure(http);
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/login").permitAll();
+        // http.authorizeRequests().anyRequest().authenticated();
     }
+
 }

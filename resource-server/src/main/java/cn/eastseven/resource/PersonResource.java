@@ -5,11 +5,9 @@ import cn.eastseven.module.human.PersonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,13 +24,11 @@ public class PersonResource {
 
     @GetMapping("/{id}")
     public Object getFullName(@PathVariable long id,
-                              Principal principal,
+                              HttpServletRequest request,
                               @RequestHeader("Authorization") String authorization) {
 
-        log.debug("{}, {}", principal.getName(), authorization);
-
-        Jwt jwt = JwtHelper.decode(authorization.split(" ")[1]);
-        log.debug("{}, {}", jwt.getClaims(), jwt.getEncoded());
+        String auth = request.getHeader("Authorization");
+        log.debug("Authorization={}\nauth={}", authorization, auth);
 
         Map<String, Object> response = new HashMap();
         response.put("fullname", "无名氏");

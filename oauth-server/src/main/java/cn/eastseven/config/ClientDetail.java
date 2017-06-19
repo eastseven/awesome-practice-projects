@@ -71,7 +71,7 @@ public class ClientDetail implements ClientDetails {
 
     @Override
     public Integer getAccessTokenValiditySeconds() {
-        return null;
+        return 180;
     }
 
     @Override
