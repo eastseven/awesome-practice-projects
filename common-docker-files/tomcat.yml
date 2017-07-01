@@ -1,0 +1,26 @@
+version: '2'
+
+services:
+  app:
+    restart: always
+    image: bitnami/tomcat:latest
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+    ports:
+      - 8080:8080
+    volumes:
+      - ./target/easyreport:/bitnami/tomcat
+
+  mysql:
+    image: mariadb
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=easyreport
+      - MYSQL_USER=easyreport
+      - MYSQL_PASSWORD=easyreport
+    volumes:
+      - ./target/easyreport-db:/var/lib/mysql

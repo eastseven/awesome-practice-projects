@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  solr:
+    container_name: search-server
+    image: solr:6.5.0-alpine
+    ports:
+      - 8983:8983

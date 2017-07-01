@@ -1,0 +1,10 @@
+version: '2'
+
+services:
+  app:
+    container_name: nexus-oss
+    image: sonatype/nexus
+    ports:
+    - 8081:8081
+    volumes:
+    - ./target/nexus-data:/sonatype-work

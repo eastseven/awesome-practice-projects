@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  nginx:
+    image: 'bitnami/nginx:latest'
+    ports:
+      - '8080:80'
+    volumes:
+      - ./target/nginx_html:/app

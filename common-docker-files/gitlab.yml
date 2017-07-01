@@ -1,0 +1,85 @@
+version: '2'
+
+services:
+  redis:
+    restart: always
+    image: sameersbn/redis:latest
+    command:
+    - --loglevel warning
+    volumes:
+      - ./target/gitlab/redis:/var/lib/redis
+
+  postgresql:
+    restart: always
+    image: sameersbn/postgresql:9.6-2
+    volumes:
+      - ./target/gitlab/postgresql:/var/lib/postgresql
+    environment:
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlabhq_production
+    - DB_EXTENSION=pg_trgm
+  gitlab:
+    restart: always
+    image: sameersbn/gitlab:9.0.2
+    depends_on:
+    - redis
+    - postgresql
+    ports:
+    - "10080:80"
+    - "10022:22"
+    volumes:
+      - ./target/gitlab/gitlab:/home/git/data
+    environment:
+    - DEBUG=false
+
+    - DB_ADAPTER=postgresql
+    - DB_HOST=postgresql
+    - DB_PORT=5432
+    - DB_USER=gitlab
+    - DB_PASS=password
+    - DB_NAME=gitlabhq_production
+
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+
+    - TZ=Asia/Chongqing
+    - GITLAB_TIMEZONE=Chongqing
+
+    - GITLAB_HTTPS=false
+    - SSL_SELF_SIGNED=false
+
+    - GITLAB_HOST=192.168.50.43
+    - GITLAB_PORT=10080
+    - GITLAB_SSH_PORT=10022
+    - GITLAB_SECRETS_DB_KEY_BASE=e10adc3949ba59abbe56e057f20f883e
+    - GITLAB_SECRETS_SECRET_KEY_BASE=e10adc3949ba59abbe56e057f20f883e
+    - GITLAB_SECRETS_OTP_KEY_BASE=e10adc3949ba59abbe56e057f20f883e
+
+    - GITLAB_NOTIFY_ON_BROKEN_BUILDS=true
+    - GITLAB_NOTIFY_PUSHER=false
+
+    - GITLAB_BACKUP_SCHEDULE=daily
+    - GITLAB_BACKUP_TIME=01:00
+
+    - GITLAB_ROOT_EMAIL=debug7@yeah.net
+    - GITLAB_EMAIL=debug7@yeah.net
+    - GITLAB_EMAIL_ENABLED=true
+
+    - SMTP_ENABLED=true
+    - SMTP_DOMAIN=yeah.net
+    - SMTP_HOST=smtp.yeah.net
+    - SMTP_PORT=25
+    - SMTP_USER=debug7@yeah.net
+    - SMTP_PASS=123456D
+    - SMTP_STARTTLS=false
+    - SMTP_AUTHENTICATION=login
+
+    - IMAP_ENABLED=true
+    - IMAP_HOST=imap.yeah.net
+    - IMAP_PORT=143
+    - IMAP_USER=debug7@yeah.net
+    - IMAP_PASS=123456D
+    - IMAP_SSL=false
+
+ # D654321   
