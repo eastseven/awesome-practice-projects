@@ -5,6 +5,7 @@ import cn.eastseven.mapper.FactWeatherMapper;
 import cn.eastseven.model.Area;
 import cn.eastseven.model.FactWeather;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,14 +42,16 @@ public class MybatisApplicationTests {
 
         log.debug("area data count={}, {}", all.size(), all.getClass());
 
-        List<Area> page = areaMapper.page(1, 10);
+        PageHelper.startPage(1, 10);
+        List<Area> page = areaMapper.page(Maps.newHashMap());
         Assert.assertNotNull(all);
         Assert.assertEquals(page.size(), 10);
         log.debug("\t->{}, {}", page.getClass(), page);
         page.stream().forEach(System.out::println);
 
         Arrays.stream(new Integer[]{1, 2, 3}).forEach(pageNum -> {
-            List<Area> list = areaMapper.page(pageNum, 15);
+            PageHelper.startPage(pageNum, 15);
+            List<Area> list = areaMapper.page(Maps.newHashMap());
             log.debug("\t->{}", list);
             list.stream().forEach(System.out::println);
         });
