@@ -27,3 +27,6 @@ zipfile
 .idea/
 client-vue
 *.log
+
+server-context-path
+ueditor
