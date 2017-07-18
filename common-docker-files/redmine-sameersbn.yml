@@ -1,0 +1,35 @@
+version: '2'
+
+services:
+  mysql:
+    container_name: redmine-db-2
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: redmine_production
+    volumes:
+      - ./target/redmine/sameersbn-redmine-db:/var/lib/mysql
+
+  redmine:
+    depends_on:
+    - mysql
+    links:
+    - mysql:mysql
+    image: sameersbn/redmine:3.3.2-1
+    environment:
+    - TZ=Asia/Shanghai
+
+    - DB_ADAPTER=mysql2
+    - DB_HOST=mysql
+    - DB_PORT=3306
+    - DB_USER=root
+    - DB_PASS=example
+    - DB_NAME=redmine_production
+
+    - REDMINE_PORT=10083
+
+    ports:
+    - "10083:80"
+    volumes:
+    - ./target/redmine/sameersbn-redmine:/home/redmine/data

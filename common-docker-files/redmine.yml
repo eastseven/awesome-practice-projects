@@ -1,0 +1,27 @@
+version: '2'
+
+services:
+  mysql:
+    container_name: redmine-db
+    image: mysql:5.7
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: redmine
+    volumes:
+      - ./target/redmine/db:/var/lib/mysql
+
+  redmine:
+    depends_on:
+    - mysql
+    links:
+    - mysql:mysql
+    image: redmine
+    container_name: redmine
+    ports:
+      - 3000:3000
+    environment:
+      REDMINE_DB_MYSQL: mysql
+      REDMINE_DB_PASSWORD: example
+    volumes:
+      - ./target/redmine/data:/usr/src/redmine/files
