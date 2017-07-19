@@ -1,0 +1,6 @@
+logging:
+  level:
+    cn.eastseven: debug
+spring:
+  thymeleaf:
+    cache: false
