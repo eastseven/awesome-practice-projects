@@ -22,13 +22,3 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
-
-zipfile
-.idea/
-client-vue
-*.log
-
-server-context-path
-ueditor
-
-metronic-responsive-admin-dashboard-template/src/main/resource/static/metronic_v4.7.5/
