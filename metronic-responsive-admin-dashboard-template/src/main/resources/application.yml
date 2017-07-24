@@ -6,3 +6,5 @@ spring:
     cache: false
 security:
   ignored: "/assets/**"
+server:
+  port: 9527
