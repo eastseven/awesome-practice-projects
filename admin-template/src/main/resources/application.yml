@@ -1,0 +1,4 @@
+spring.thymeleaf.cache: false
+spring.thymeleaf.mode: HTML
+
+logging.level.cn.eastseven.admin: debug
