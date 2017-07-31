@@ -1,0 +1,10 @@
+logging:
+  level:
+    cn.eastseven.crud: debug
+spring:
+  thymeleaf:
+    cache: false
+    mode: HTML
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
