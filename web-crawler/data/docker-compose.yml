@@ -1,0 +1,15 @@
+version: '2'
+
+services:
+  mysql:
+    image: mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=web-crawler
+      - MYSQL_USER=crawler
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - ./web-crawler-db:/var/lib/mysql
