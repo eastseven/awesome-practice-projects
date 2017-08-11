@@ -28,4 +28,5 @@ public class AdminTemplateApplication {
     public String hello() {
         return "ace/hello";
     }
+
 }
