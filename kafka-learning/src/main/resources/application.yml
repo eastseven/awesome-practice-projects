@@ -1,0 +1,8 @@
+logging:
+  level:
+    cn.eastseven.kafka: debug
+spring:
+  kafka:
+    producer:
+      key-serializer: java.lang.String
+      value-serializer: java.lang.String
