@@ -19,12 +19,18 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @Column(unique = true)
+    private String url;
+
+    @Enumerated
+    private BookOrigin origin;
+
     private String name;
 
     private String price, originPrice;
 
     private String image;
 
-    @Column(unique = true)
-    private String url;
+    private String isbn;
+
 }
