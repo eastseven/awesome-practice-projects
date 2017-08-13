@@ -1,0 +1,37 @@
+version: "2"
+
+services:
+  mysql:
+    image: mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=sonar
+      - MYSQL_DATABASE=sonar
+      - MYSQL_USER=sonar
+      - MYSQL_PASSWORD=sonar
+    volumes:
+      - ./sonarqube-mysql:/var/lib/mysql
+  sonarqube:
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+    image: sonarqube:alpine
+    ports:
+      - "9000:9000"
+    environment:
+      - SONARQUBE_JDBC_URL=jdbc:mysql://mysql:3306/sonar?useUnicode=true&characterEncoding=utf8&useSSL=false
+      - SONARQUBE_JDBC_USERNAME=sonar
+      - SONARQUBE_JDBC_PASSWORD=sonar
+      - TZ=Asia/Shanghai
+      - LANG=zh_CN.UTF-8
+      - LANGUAGE=zh_CN:zh
+      - LC_ALL=zh_CN.UTF-8
+    volumes:
+      - ./sonarqube-data/conf:/opt/sonarqube/conf
+      - ./sonarqube-data/data:/opt/sonarqube/data
+      - ./sonarqube-data/extensions:/opt/sonarqube/extensions
+      - ./sonarqube-data/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
