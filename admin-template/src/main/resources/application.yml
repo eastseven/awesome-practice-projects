@@ -2,3 +2,15 @@ spring.thymeleaf.cache: false
 spring.thymeleaf.mode: HTML
 
 logging.level.cn.eastseven.admin: debug
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    generate-ddl: true
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3307/web-crawler?useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: 123456
