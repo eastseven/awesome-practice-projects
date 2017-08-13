@@ -4,7 +4,7 @@
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>Form Submit</title>
+    <title>Ajax Form Submit</title>
 
     <!-- Bootstrap -->
     <link href="webjars/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
@@ -19,29 +19,31 @@
 <body>
 <div class="container">
     <div class="row">
-        <h1>Form Submit</h1>
+        <h1>Ajax Form Submit</h1>
     </div>
     <div class="row">
 
-        <form class="form-horizontal" method="post" th:object="${formObject}" th:action="@{/form.html}" enctype="multipart/form-data">
+        <form class="form-horizontal" method="post" th:object="${formObject}" action="#" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="inputEmail3" class="col-sm-2 control-label">Email</label>
                 <div class="col-sm-10">
-                    <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="username" th:field="*{username}"/>
-                    <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" style="color: red">Email Error</div>
+                    <input type="email" class="form-control" id="inputEmail3" placeholder="Email" name="username"/>
+                    <div id="usernameError" class="has-error"></div>
                 </div>
             </div>
             <div class="form-group">
                 <label for="inputPassword3" class="col-sm-2 control-label">Password</label>
                 <div class="col-sm-10">
-                    <input type="password" class="form-control" id="inputPassword3" placeholder="Password" name="password" th:field="*{password}"/>
-                    <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" style="color: red">Email Error</div>
+                    <input type="password" class="form-control" id="inputPassword3" placeholder="Password"
+                           name="password"/>
+                    <div id="passwordError" class="has-error"></div>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-2 control-label">File 1</label>
                 <div class="col-sm-10">
-                    <input type="file" class="form-control" placeholder="File 1" name="file1" accept="image/jpeg,image/jpg"/>
+                    <input type="file" class="form-control" placeholder="File 1" name="file1"
+                           accept="image/jpeg,image/jpg"/>
                 </div>
             </div>
             <div class="form-group">
@@ -54,7 +56,7 @@
                 <div class="col-sm-offset-2 col-sm-10">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="remember" th:field="*{remember}"/> Remember me
+                            <input type="checkbox" name="remember"/> Remember me
                         </label>
                     </div>
                 </div>
@@ -73,6 +75,47 @@
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script th:src="@{/webjars/jquery/1.12.4/jquery.js}" src="webjars/jquery/1.12.4/jquery.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
-<script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}" src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script th:src="@{/webjars/bootstrap/3.3.7/js/bootstrap.min.js}"
+        src="webjars/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('form').submit(function (e) {
+            e.preventDefault();
+            console.log('form submit', $('form').serialize());
+            var data = {
+                username: $('form input[name=username]').val(),
+                password: $('form input[name=password]').val()
+            };
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/form/ajax/submit",
+                data: JSON.stringify(data),
+                dataType: 'json',
+                timeout: 100000,
+                success: function (data) {
+                    console.log("SUCCESS: ", data);
+                    if (!data.success) {
+                        for (var index in data.error) {
+                            var error = data.error[index];
+                            console.log(error);
+                            $('#' + error.field + 'Error').text(error.defaultMessage);
+                        }
+                    } else {
+                        $('.has-error').text('');
+                    }
+                },
+                error: function (e) {
+                    console.log("ERROR: ", e);
+
+                },
+                done: function (e) {
+                    console.log("DONE");
+                }
+            });
+        });
+    });
+
+</script>
 </body>
 </html>
