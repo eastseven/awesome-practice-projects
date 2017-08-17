@@ -16,21 +16,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests()
-                .antMatchers("/login/**", "/assets/**").permitAll()
+            .authorizeRequests()
+                .antMatchers("/login.html", "/assets/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .formLogin()
-                .loginPage("/login")
+            .formLogin()
+                .loginPage("/login.html").loginProcessingUrl("/login.html").defaultSuccessUrl("/index.html")
                 .permitAll()
                 .and()
-                .logout()
+            .logout()
                 .permitAll();
     }
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
-                .withUser("user").password("password").roles("USER");
+                .withUser("admin").password("123456").roles("ADMIN");
     }
 }

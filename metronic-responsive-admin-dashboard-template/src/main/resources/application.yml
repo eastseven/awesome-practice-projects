@@ -4,6 +4,7 @@ logging:
 spring:
   thymeleaf:
     cache: false
+    mode: HTML
 security:
   ignored: "/assets/**"
 server:

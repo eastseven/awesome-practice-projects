@@ -11,16 +11,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @SpringBootApplication
 public class AdminDashboardTemplateApplication extends WebMvcConfigurerAdapter {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AdminDashboardTemplateApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AdminDashboardTemplateApplication.class, args);
+    }
 
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-		//registry.addViewController("/").setViewName("index");
-		registry.addViewController("/login").setViewName("login");
-	}
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        //registry.addViewController("/").setViewName("index");
+        registry.addViewController("/login.html").setViewName("login");
+    }
 
-	@GetMapping("/")
-	public String index() {return "index";}
+    @GetMapping(value = {"/", "/index.html"})
+    public String index() {
+        return "index";
+    }
 }
