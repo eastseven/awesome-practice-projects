@@ -1,0 +1,14 @@
+spring:
+  hadoop:
+    fs-uri: hdfs://localhost:9000
+  data:
+    mongodb:
+      host: 192.168.3.230
+      port: 27017
+      database: business
+logging:
+  level:
+    cn.eastseven.web.crawler: debug
+
+app.hadoop.dir: /d7/
+app.hadoop.local.dir: target${app.hadoop.dir}/

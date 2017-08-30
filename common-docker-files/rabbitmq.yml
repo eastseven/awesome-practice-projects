@@ -1,0 +1,12 @@
+version: '2'
+
+services:
+  app:
+    container_name: rabbitmq-mangement
+    image: rabbitmq:management-alpine
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password

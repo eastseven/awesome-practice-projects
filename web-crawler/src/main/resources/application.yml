@@ -13,3 +13,5 @@ spring:
     url: jdbc:mysql://localhost:3307/web-crawler?useUnicode=true&characterEncoding=utf-8&useSSL=false
     username: root
     password: 123456
+  application:
+    name: web-crawler

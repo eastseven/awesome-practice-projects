@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Lists;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Page;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
@@ -41,5 +42,7 @@ public class CategoryProcessor implements PageProcessor {
                 });
 
         page.getResultItems().put("categoryList", categoryList);
+
+        page.putField("", "");
     }
 }
