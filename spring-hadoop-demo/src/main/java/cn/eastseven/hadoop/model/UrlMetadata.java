@@ -12,6 +12,8 @@ public class UrlMetadata {
     public static final String TABLE_NAME = "url_metadata";
     public static final String FAMILY_NAME = "f";
 
+    private String id;
+
     private String url;
     private String text;
     private String origin;

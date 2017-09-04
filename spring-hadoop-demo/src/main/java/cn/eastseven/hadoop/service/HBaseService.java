@@ -70,7 +70,8 @@ public class HBaseService {
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
+            log.error("", e);
         }
         return false;
     }
