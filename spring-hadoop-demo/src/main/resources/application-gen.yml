@@ -1,0 +1,10 @@
+gen.entity: |
+  {
+    "packageName": "cn.eastseven.hadoop.demo",
+    "className": "CompanyNameIdcode",
+    "tableName": "company_name_idcode",
+    "properties": [
+      {"name": "company_id", "type": "String"},
+      {"name": "company_name", "type": "String"},
+    ]
+  }

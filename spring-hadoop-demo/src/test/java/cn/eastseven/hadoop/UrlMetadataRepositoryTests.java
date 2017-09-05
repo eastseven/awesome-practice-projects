@@ -59,5 +59,6 @@ public class UrlMetadataRepositoryTests {
         UrlMetadata inDb = urlMetadataRepository.findOne(saved.getId());
         Assert.assertNotNull(inDb);
         log.debug("{}", inDb);
+
     }
 }

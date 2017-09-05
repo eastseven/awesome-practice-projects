@@ -6,4 +6,4 @@ spring:
   hadoop:
     fs-uri: hdfs://192.168.3.91:9000
   profiles:
-    include: hbase
+    include: hbase, gen

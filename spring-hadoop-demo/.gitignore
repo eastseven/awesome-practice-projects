@@ -22,3 +22,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+src/main/java/cn/eastseven/hadoop/business/
+src/test/java/cn/eastseven/hadoop/CompanyNameIdcodeRepositoryTests.java
