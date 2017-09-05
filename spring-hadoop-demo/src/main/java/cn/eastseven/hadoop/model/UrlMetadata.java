@@ -3,8 +3,6 @@ package cn.eastseven.hadoop.model;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 @Builder
 public class UrlMetadata {
@@ -19,5 +17,5 @@ public class UrlMetadata {
     private String origin;
     private int level = 0;
     
-    private Date createTime = new Date();
+    private String createTime;
 }

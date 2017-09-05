@@ -9,6 +9,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.data.hadoop.hbase.HbaseTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.UUID;
 
 @Slf4j
@@ -24,24 +26,31 @@ public class UrlMetadataRepositoryImpl implements UrlMetadataRepository, UrlMeta
 
     public UrlMetadataRepositoryImpl() {
         log.debug("HBaseService {}", hbaseService);
-        try {
-            if (!hbaseService.isTableExist(UrlMetadata.TABLE_NAME)) {
-                hbaseService.createTable(UrlMetadata.TABLE_NAME, new String[]{UrlMetadata.FAMILY_NAME});
-            }
-        } catch (Exception e) {
-            log.error("", e);
-        }
     }
 
     @Override
     public <S extends UrlMetadata> S save(S entity) {
-        String rowKey = UUID.randomUUID().toString();
-//        hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowKey, UrlMetadata.FAMILY_NAME, "url", "http://blog.eastseven.cn".getBytes());
-//        hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowKey, UrlMetadata.FAMILY_NAME, "text", "Hello HBase".getBytes());
-//        hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowKey, UrlMetadata.FAMILY_NAME, "origin", "http://www.eastseven.cn".getBytes());
-//        hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowKey, UrlMetadata.FAMILY_NAME, "level", "0".getBytes());
-//        hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowKey, UrlMetadata.FAMILY_NAME, "createTime", "2017-09-01 18:05:50".getBytes());
-        return null;
+        String rowName = UUID.randomUUID().toString();
+        entity.setId(rowName);
+
+        Class clz = entity.getClass();
+        for (Field field : clz.getDeclaredFields()) {
+            if (!Modifier.isPrivate(field.getModifiers())) continue;
+            String qualifier = field.getName();
+            byte[] value = null;
+            try {
+                field.setAccessible(true);
+                Object object = field.get(entity);
+                value = object != null ? object.toString().getBytes() : null;
+            } catch (IllegalAccessException e) {
+                log.error("", e);
+            } finally {
+                field.setAccessible(false);
+            }
+
+            hbaseTemplate.put(UrlMetadata.TABLE_NAME, rowName, UrlMetadata.FAMILY_NAME, qualifier, value);
+        }
+        return entity;
     }
 
     @Override
@@ -95,8 +104,7 @@ public class UrlMetadataRepositoryImpl implements UrlMetadataRepository, UrlMeta
     }
 
     @Override
-    public boolean createTable(UrlMetadata urlMetadata) {
-
-        return false;
+    public boolean createTable() {
+        return hbaseService.createTable(UrlMetadata.TABLE_NAME, new String[]{UrlMetadata.FAMILY_NAME});
     }
 }
