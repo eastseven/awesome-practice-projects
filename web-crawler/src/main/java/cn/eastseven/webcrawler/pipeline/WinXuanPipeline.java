@@ -1,11 +1,8 @@
 package cn.eastseven.webcrawler.pipeline;
 
-import cn.eastseven.webcrawler.model.Book;
-import cn.eastseven.webcrawler.model.BookOrigin;
 import cn.eastseven.webcrawler.model.WinXuan;
-import cn.eastseven.webcrawler.repository.BookRepository;
+import cn.eastseven.webcrawler.repository.WinXuanRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,15 +15,10 @@ import us.codecraft.webmagic.pipeline.PageModelPipeline;
 public class WinXuanPipeline implements PageModelPipeline<WinXuan> {
 
     @Autowired
-    BookRepository bookRepository;
+    WinXuanRepository winXuanRepository;
 
     @Override
     public void process(WinXuan winXuan, Task task) {
-        if (bookRepository.findByUrl(winXuan.getUrl()) == null) {
-            Book book = Book.builder().origin(BookOrigin.WIN_XUAN).build();
-            BeanUtils.copyProperties(winXuan, book);
-            bookRepository.save(book);
-            log.debug("{}", book);
-        }
+        winXuanRepository.save(winXuan);
     }
 }

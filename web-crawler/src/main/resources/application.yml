@@ -5,13 +5,21 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     generate-ddl: true
-
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3307/web-crawler?useUnicode=true&characterEncoding=utf-8&useSSL=false
-    username: root
-    password: 123456
+  redis:
+    host: 192.168.3.81
+    port: 6379
+    password: har123
+    database: 7
+  data:
+    mongodb:
+      host: 192.168.3.81
+      port: 27017
+      database: crawler
   application:
     name: web-crawler
+
+app.proxy.pool:
+  url: http://192.168.3.117:5000/get/
+  urls: http://192.168.3.117:5000/get_all/
