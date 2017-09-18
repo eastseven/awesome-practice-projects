@@ -14,7 +14,13 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 @Data
 @Slf4j
 @TargetUrl("http://item.winxuan.com/\\d+")
-@HelpUrl("http://www.winxuan.com/")
+@HelpUrl({
+        "http://www.winxuan.com/*",
+        "http://search.winxuan.com/*",
+        "http://list.winxuan.com/*",
+        "http://www.winxuan.com/catalog_book.html"
+})
+@SeedUrl("http://www.winxuan.com/")
 @Document(collection = "book_wen_xuan")
 public class WinXuan implements AfterExtractor {
 
@@ -36,6 +42,8 @@ public class WinXuan implements AfterExtractor {
 
     private String image;
 
+    private String contents;
+
     @Override
     public void afterProcess(Page page) {
         this.url = page.getUrl().get();
@@ -52,6 +60,8 @@ public class WinXuan implements AfterExtractor {
 
         this.image = page.getHtml().getDocument().body().select("div.info-side div.img a.jqzoom").attr("href");
 
-        //log.debug("\nurl={}\nname={}\nop={},p={}\nisbn={}\n\n", this.url, this.name, this.originPrice, this.price, this.isbn);
+        //#page > div.layout.grid-lt210rt990.J_Layout > div.col-main > div > div:nth-child(5) > div > div:nth-child(1)
+        this.contents = page.getHtml().getDocument().body().select("div.unit.book-introduce div:nth-child(1) div.text-words-1").html();
+        //log.debug(" === contents ===\n{}", contents);
     }
 }

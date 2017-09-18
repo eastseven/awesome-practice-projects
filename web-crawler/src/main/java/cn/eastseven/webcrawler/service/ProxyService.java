@@ -17,6 +17,12 @@ public class ProxyService {
 
     @Value("${app.proxy.pool.url}") String GET_PROXY_URL;
 
+    public HttpClientDownloader getDownloader() {
+        HttpClientDownloader downloader = new HttpClientDownloader();
+        downloader.setProxyProvider(SimpleProxyProvider.from(getValidProxy()));
+        return downloader;
+    }
+
     public Proxy get() {
         try {
             String html = Jsoup.parse(new URL(GET_PROXY_URL), 10000).body().html();

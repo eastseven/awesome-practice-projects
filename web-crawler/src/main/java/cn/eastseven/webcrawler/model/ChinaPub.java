@@ -2,6 +2,7 @@ package cn.eastseven.webcrawler.model;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.nodes.Element;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import us.codecraft.webmagic.Page;
@@ -13,7 +14,8 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 @Data
 @Slf4j
 @TargetUrl("http://product.china-pub.com/\\d+")
-@HelpUrl("http://www.china-pub.com/")
+@HelpUrl("http://www.china-pub.com/*")
+@SeedUrl("http://www.china-pub.com/")
 @Document(collection = "book_china_pub")
 public class ChinaPub implements AfterExtractor {
 
@@ -34,9 +36,15 @@ public class ChinaPub implements AfterExtractor {
 
     private String image;
 
+    private String contents;
+
     @Override
     public void afterProcess(Page page) {
         this.url = page.getUrl().get();
         this.image = page.getHtml().getDocument().body().select("div.pro_book_img img").attr("src");
+
+        Element contentTag = page.getHtml().getDocument().body().select("div#con_a_1 div.pro_r_deta h3#ml").first().siblingElements().first();
+        this.contents = contentTag.html();
+        //log.debug(" === contents ===\n{}", contents);
     }
 }

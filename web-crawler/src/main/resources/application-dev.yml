@@ -1,7 +1,6 @@
 logging:
   level:
     cn.eastseven.webcrawler: debug
-  file: dev.log
 spring:
   jpa:
     hibernate:
@@ -9,17 +8,18 @@ spring:
     show-sql: false
     generate-ddl: true
   redis:
-    host: localhost
+    host: 192.168.3.81
     port: 6379
-    password: 123456
+    password: har123
+    database: 7
   data:
     mongodb:
-      host: localhost
+      host: 192.168.3.81
       port: 27017
       database: crawler
   application:
     name: web-crawler
 
 app.proxy.pool:
-  url: http://www.eastseven.cn:5000/get/
-  urls: http://www.eastseven.cn:5000/get_all/
+  url: http://192.168.3.117:5000/get/
+  urls: http://192.168.3.117:5000/get_all/
