@@ -20,7 +20,7 @@ public class ShellCmdTests {
         Process process = Runtime.getRuntime().exec(cmd);
         boolean bln = process.waitFor(30, TimeUnit.SECONDS);
         log.debug("waitFor {}", bln);
-        List result = IOUtils.readLines(process.getInputStream());
+        List result = IOUtils.readLines(process.getInputStream(), "UTF-8");
         Assert.assertNotNull(result);
         log.debug("{}", result);
 
