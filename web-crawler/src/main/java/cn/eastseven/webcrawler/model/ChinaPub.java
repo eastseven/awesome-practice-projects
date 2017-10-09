@@ -36,12 +36,16 @@ public class ChinaPub implements AfterExtractor {
 
     private String image;
 
+    private String info;
+
     private String contents;
 
     @Override
     public void afterProcess(Page page) {
         this.url = page.getUrl().get();
         this.image = page.getHtml().getDocument().body().select("div.pro_book_img img").attr("src");
+
+        this.info = page.getHtml().getDocument().body().select("#con_a_1 > div:nth-child(1) > ul").html();
 
         Element contentTag = page.getHtml().getDocument().body().select("div#con_a_1 div.pro_r_deta h3#ml").first().siblingElements().first();
         this.contents = contentTag.html();

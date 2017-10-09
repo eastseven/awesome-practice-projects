@@ -42,6 +42,8 @@ public class WinXuan implements AfterExtractor {
 
     private String image;
 
+    private String info;
+
     private String contents;
 
     @Override
@@ -59,8 +61,8 @@ public class WinXuan implements AfterExtractor {
 
         this.image = page.getHtml().getDocument().body().select("div.info-side div.img a.jqzoom").attr("href");
 
-        //#page > div.layout.grid-lt210rt990.J_Layout > div.col-main > div > div:nth-child(5) > div > div:nth-child(1)
         this.contents = page.getHtml().getDocument().body().select("div.unit.book-introduce div:nth-child(1) div.text-words-1").html();
-        //log.debug(" === contents ===\n{}", contents);
+
+        this.info = page.getHtml().getDocument().body().select("div.col-main > div > div:nth-child(3) > div > div > div.cont > ul").html();
     }
 }

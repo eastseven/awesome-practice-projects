@@ -37,6 +37,8 @@ public class DangDang implements AfterExtractor {
     //@ExtractBy(type = ExtractBy.Type.Css, value = "div#largePicDiv > a > img")
     private String image;
 
+    private String info;
+
     private String contents;
 
     @Override
@@ -50,6 +52,8 @@ public class DangDang implements AfterExtractor {
                 break;
             }
         }
+
+        this.info = page.getHtml().getDocument().body().select("#detail_describe").html();
 
         this.contents = page.getHtml().getDocument().body().select("textarea#catalog-textarea").html();
     }
