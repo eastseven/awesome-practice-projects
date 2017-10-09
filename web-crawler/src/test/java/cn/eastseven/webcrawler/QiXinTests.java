@@ -23,8 +23,15 @@ public class QiXinTests {
         Assert.assertNotNull(driver);
 
         driver.get("http://www.qixin.com/auth/login");
+        //driver.get("http://www.msj1.com/kanmeiju-ed2k");
+        try {
+            Thread.sleep(1000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println(">>> 1 <<< \n"+driver.getPageSource());
 
+        /*
         driver.findElement(By.id("s1-0[0]-0[0]-account")).sendKeys("17380678381");
         driver.findElement(By.id("s1-0[0]-0[0]-password")).sendKeys("dq123456");
         driver.findElement(By.cssSelector("div.form-group a.btn.btn-primary.btn-block.btn-lg")).click();
@@ -34,12 +41,13 @@ public class QiXinTests {
 
         driver.quit();
         System.out.println("==========");
-
+        */
     }
 
     @Test
     public void testChrome() {
-        System.setProperty("webdriver.chrome.driver", "/Users/dongqi/Dev/chromedriver");
+        String chromeDriver = "/Users/dongqi/Dev/code/work-har/har-sjfxpt/har-business-crawler-tianyancha/libs/selenium/mac/chromedriver";
+        System.setProperty("webdriver.chrome.driver", chromeDriver);
         WebDriver driver = new ChromeDriver();
 
         Assert.assertNotNull(driver);
@@ -47,11 +55,14 @@ public class QiXinTests {
         driver.get("http://www.qixin.com/auth/login");
 
         driver.findElement(By.id("s1-0[0]-0[0]-account")).sendKeys("17380678381");
-        driver.findElement(By.id("s1-0[0]-0[0]-password")).sendKeys("dq123456");
+        driver.findElement(By.id("s1-0[0]-0[0]-password")).sendKeys("d12345678");
         driver.findElement(By.cssSelector("div.form-group a.btn.btn-primary.btn-block.btn-lg")).click();
 
-
-
-        //driver.close();
+        try {
+            Thread.sleep(60000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        driver.close();
     }
 }

@@ -13,7 +13,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 
 @Data
 @Slf4j
-@TargetUrl("http://item.winxuan.com/\\d+")
+@TargetUrl({"http://item.winxuan.com/\\d+", "http://www.winxuan.com/product/\\d+"})
 @HelpUrl({
         "http://www.winxuan.com/*",
         "http://search.winxuan.com/*",
@@ -47,7 +47,6 @@ public class WinXuan implements AfterExtractor {
     @Override
     public void afterProcess(Page page) {
         this.url = page.getUrl().get();
-        log.debug(" ===== {}", this.url);
 
         Element li = page
                 .getHtml()

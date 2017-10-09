@@ -17,6 +17,7 @@ public class KanMeiJuTests {
     @Test
     public void test() throws Exception {
         String[] urls = {
+                /*
                 //生活大爆炸
                 "http://www.kmeiju.net/archives/4423.html",
                 "http://www.kmeiju.net/archives/3757.html",
@@ -42,14 +43,14 @@ public class KanMeiJuTests {
                 //警察世家
                 //"http://www.kmeiju.net/archives/4200.html",
                 //妙探双姝 Rizzoli & Isles
-                "http://www.kmeiju.net/archives/4292.html",
-                "http://www.kmeiju.net/archives/989.html",
-                "http://www.kmeiju.net/archives/986.html",
-                "http://www.kmeiju.net/archives/983.html",
-                "http://www.kmeiju.net/archives/980.html",
-                "http://www.kmeiju.net/archives/977.html",
-                "http://www.kmeiju.net/archives/974.html",
-                //
+                "http://www.kmeiju.net/archives/4292.html",*/
+                "http://www.msj1.com/archives/989.html",
+//                "http://www.kmeiju.net/archives/986.html",
+//                "http://www.kmeiju.net/archives/983.html",
+//                "http://www.kmeiju.net/archives/980.html",
+//                "http://www.kmeiju.net/archives/977.html",
+//                "http://www.kmeiju.net/archives/974.html",
+
         };
 
         for (String url : urls) {
@@ -61,15 +62,16 @@ public class KanMeiJuTests {
             log.debug("{}", name);
 
             String content = "";
-            content += name + '\t' + url + '\n';
+            //content += name + '\t' + url + '\n';
             Element table = body.select("#content > table.table").first();
             for (Element element : table.select("tr")) { //#content > table:nth-child(9) > tbody > tr:nth-child(2) > td:nth-child(1)
                 //log.debug("{}\n{}", name, element);
+                //#content > table:nth-child(8) > tbody > tr:nth-child(2) > td:nth-child(1) > a:nth-child(2)
                 content += element.select("td:nth-child(1) a").attr("href") + '\n';
             }
 
             if (StringUtils.isNoneBlank(content)) {
-                Files.write(content.getBytes(), Paths.get("target", name + ".txt").toFile());
+                Files.write(content.getBytes(), Paths.get("target", name + ".downlist").toFile());
             } else {
                 log.warn("{} content is empty, {}", name, url);
             }

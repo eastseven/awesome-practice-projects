@@ -30,15 +30,18 @@ public class MongoPipeline implements PageModelPipeline {
         //log.debug("= {} = {}", o.getClass(), o);
 
         if (o instanceof DangDang) {
-            dangDangRepository.save((DangDang) o);
+            DangDang dangDang = dangDangRepository.save((DangDang) o);
+            log.info("当当 {}, {}, {}", dangDang.getName(), dangDang.getPrice(), dangDang.getUrl());
         }
 
         if (o instanceof ChinaPub) {
-            chinaPubRepository.save((ChinaPub) o);
+            ChinaPub chinaPub = chinaPubRepository.save((ChinaPub) o);
+            log.info("互动 {}, {}, {}", chinaPub.getName(), chinaPub.getPrice(), chinaPub.getUrl());
         }
 
         if (o instanceof WinXuan) {
-            winXuanRepository.save((WinXuan) o);
+            WinXuan winXuan = winXuanRepository.save((WinXuan) o);
+            log.info("文轩 {}, {}, {}", winXuan.getName(), winXuan.getPrice(), winXuan.getUrl());
         }
     }
 }

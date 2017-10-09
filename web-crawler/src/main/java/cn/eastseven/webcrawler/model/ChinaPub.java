@@ -45,6 +45,5 @@ public class ChinaPub implements AfterExtractor {
 
         Element contentTag = page.getHtml().getDocument().body().select("div#con_a_1 div.pro_r_deta h3#ml").first().siblingElements().first();
         this.contents = contentTag.html();
-        //log.debug(" === contents ===\n{}", contents);
     }
 }

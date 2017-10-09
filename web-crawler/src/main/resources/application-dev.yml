@@ -23,3 +23,7 @@ spring:
 app.proxy.pool:
   url: http://192.168.3.117:5000/get/
   urls: http://192.168.3.117:5000/get_all/
+
+crawler.libs:
+  phantomjs: libs/phantomjs/#/phantomjs
+  selenium: libs/chromedriver/#/chromedriver
