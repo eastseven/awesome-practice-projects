@@ -1,0 +1,31 @@
+logging:
+  level:
+    cn.eastseven.webcrawler: debug
+  file: dev.log
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    generate-ddl: true
+  redis:
+    host: localhost
+    port: 16379
+    password: 6o0kcraw1er
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: crawler
+      password: 6o0kcraw1er
+      username: crawler
+  application:
+    name: web-crawler
+
+app.proxy.pool:
+  url: http://www.eastseven.cn:5000/get/
+  urls: http://www.eastseven.cn:5000/get_all/
+
+crawler.libs:
+  phantomjs: libs/phantomjs/#/phantomjs
+  selenium: libs/chromedriver/#/chromedriver

@@ -27,3 +27,4 @@ data/web-crawler-db
 data/mongodb-data
 data/redis-data
 data/*.txt
+dev.log.*
