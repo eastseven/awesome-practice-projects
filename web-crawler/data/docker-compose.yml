@@ -29,4 +29,4 @@ services:
     environment:
       - REDIS_PASSWORD=123456
     volumes:
-      - ./redis-data:/data
+      - ./redis-data:/bitnami/redis

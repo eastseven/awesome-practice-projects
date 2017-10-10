@@ -1,7 +1,10 @@
 package cn.eastseven.webcrawler;
 
 import cn.eastseven.webcrawler.downloader.WebDriverDownloader;
-import cn.eastseven.webcrawler.model.*;
+import cn.eastseven.webcrawler.model.ChinaPub;
+import cn.eastseven.webcrawler.model.DangDang;
+import cn.eastseven.webcrawler.model.SeedUrl;
+import cn.eastseven.webcrawler.model.WinXuan;
 import cn.eastseven.webcrawler.pipeline.ChinaPubPipeline;
 import cn.eastseven.webcrawler.pipeline.MongoPipeline;
 import cn.eastseven.webcrawler.pipeline.WinXuanPipeline;
@@ -77,7 +80,7 @@ public class WebCrawler implements CommandLineRunner {
             }
 
             Spider spider = OOSpider.create(SiteUtil.get(), mongoPipeline, pageModel)
-                    //.setScheduler(redisScheduler)
+                    .setScheduler(redisScheduler)
                     .addUrl(urls)
                     .thread(executorService, size);
 

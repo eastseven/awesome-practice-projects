@@ -2,7 +2,9 @@ package cn.eastseven.webcrawler.model;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import us.codecraft.webmagic.Page;
@@ -46,23 +48,43 @@ public class WinXuan implements AfterExtractor {
 
     private String contents;
 
+    private String publishDate; //出版时间：2014-01-01 印刷时间：2014-01-01
+
+    private String author;
+
+    private String press; //出版社
+
     @Override
     public void afterProcess(Page page) {
         this.url = page.getUrl().get();
 
-        Element li = page
-                .getHtml()
-                .getDocument()
-                .body()
-                .select("div.module div.unit div.col.col-base-2 div.cont ul.list-text-3.cf li")
-                .last();
+        Element body = page.getHtml().getDocument().body();
+        Elements elements = body.select("div.module div.unit div.col.col-base-2 div.cont ul.list-text-3.cf li");
 
-        this.isbn = li.text().replace("I S B N：", "");
+        for (Element li : elements) {
+            String text = li.text();
 
-        this.image = page.getHtml().getDocument().body().select("div.info-side div.img a.jqzoom").attr("href");
+            if (text.contains("I S B N：")) {
+                this.isbn = StringUtils.remove(text, "I S B N：");
+            }
 
-        this.contents = page.getHtml().getDocument().body().select("div.unit.book-introduce div:nth-child(1) div.text-words-1").html();
+            if (text.contains("出版时间：")) {
+                this.publishDate = StringUtils.remove(text, "出版时间：");
+            }
 
-        this.info = page.getHtml().getDocument().body().select("div.col-main > div > div:nth-child(3) > div > div > div.cont > ul").html();
+            if (text.contains("作　者：")) {
+                this.author = StringUtils.remove(text, "作　者：");
+            }
+
+            if (text.contains("出版社：")) {
+                this.press = StringUtils.remove(text, "出版社：");
+            }
+        }
+
+        this.image = body.select("div.info-side div.img a.jqzoom").attr("href");
+
+        this.contents = body.select("div.unit.book-introduce div:nth-child(1) div.text-words-1").html();
+
+        this.info = body.select("div.col-main > div > div:nth-child(3) > div > div > div.cont > ul").html();
     }
 }
