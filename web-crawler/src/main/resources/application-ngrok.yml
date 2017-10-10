@@ -15,7 +15,7 @@ spring:
   data:
     mongodb:
       host: localhost
-      port: 27017
+      port: 37017
       database: crawler
       password: 6o0kcraw1er
       username: crawler
