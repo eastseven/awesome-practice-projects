@@ -1,0 +1,8 @@
+logging:
+  level:
+    cn.eastseven: debug
+spring:
+  redis:
+    sentinel:
+      master: mymaster
+      nodes: redis_sentinel_1:26379
