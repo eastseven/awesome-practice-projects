@@ -43,7 +43,7 @@ public class HtmlTagFormatTests {
         String url = "http://zhaobiao.wubaiyi.com/show-7-318052-1.html";
         String css = "#Article div.content";
 
-        url = "http://www.chinaunicombidding.cn/jsp/cnceb/web/info1/detailNotice.jsp?id=2875703300000009139";
+        url = "http://www.ggzy.gov.cn/information/html/b/620000/0104/201710/11/00624d175de4926545eea8b7fe08e93c6f8a.shtml";
         css = "div#mycontent div.detail_content";
 
         Element root = Jsoup.connect(url).get().body().select(css).first();
@@ -80,11 +80,8 @@ public class HtmlTagFormatTests {
     public void testHtmlTagReplace() throws Exception {
         String url = "http://www.chinaunicombidding.cn/jsp/cnceb/web/info1/detailNotice.jsp?id=2875703300000009139";
         String css = "body > div.Section1";
-        url = "http://www.ggzy.gov.cn/information/html/b/660000/0204/201710/11/0066424ede6b6d994efa9c01f069190693c8.shtml";
-        css = "div.detail_content";
-
-        //url = "http://empm.ccccltd.cn/PMS/biddetail.shtml?id=J8Gis7a8zFp0/0+cu62h4ufCdjRQ/t9M5buuVsVwZblCKGlOcrU5SpArq7je03IAqGcjcm4LS06Jg7x4SlJl5mGjrLcESjEnqGcjcm4LS06wunPuBDym2zkNGvz9XSmH";
-        //css = "body > div > table";
+        url = "http://www.ggzy.gov.cn/information/html/b/410000/0201/201710/13/00417acc0b17b3da4cd6aeebd5c0b0bddff6.shtml";
+        css = "div#mycontent div.detail_content";
 
         Element body = Jsoup.connect(url).get().body();
         Assert.assertNotNull(body);
@@ -94,7 +91,8 @@ public class HtmlTagFormatTests {
         System.out.println(" ===== 原文 =====");
         System.out.println(html);
 
-        String text = StringUtils.removeAll(html, "\\w+=\".*?\"|<!-{2,}.*?-{2,}>");
+        //\w+=".*?"|
+        String text = StringUtils.removeAll(html, "(style=\".*?\")|(width=\".*?\")|(height=\".*?\")|<!-{2,}.*?-{2,}>|(&nbsp;)");
         System.out.println(" ===== 处理后 =====");
         System.out.println(text);
     }

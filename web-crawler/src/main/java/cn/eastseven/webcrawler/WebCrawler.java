@@ -1,13 +1,13 @@
 package cn.eastseven.webcrawler;
 
 import cn.eastseven.webcrawler.downloader.WebDriverDownloader;
-import cn.eastseven.webcrawler.model.ChinaPub;
-import cn.eastseven.webcrawler.model.DangDang;
-import cn.eastseven.webcrawler.model.SeedUrl;
-import cn.eastseven.webcrawler.model.WinXuan;
+import cn.eastseven.webcrawler.model.*;
 import cn.eastseven.webcrawler.pipeline.ChinaPubPipeline;
 import cn.eastseven.webcrawler.pipeline.MongoPipeline;
 import cn.eastseven.webcrawler.pipeline.WinXuanPipeline;
+import cn.eastseven.webcrawler.repository.ChinaPubRepository;
+import cn.eastseven.webcrawler.repository.DangDangRepository;
+import cn.eastseven.webcrawler.repository.WinXuanRepository;
 import cn.eastseven.webcrawler.service.ProxyService;
 import cn.eastseven.webcrawler.utils.SiteUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +17,20 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.model.OOSpider;
 import us.codecraft.webmagic.scheduler.RedisScheduler;
 
-import javax.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 @Slf4j
 @Service
-@Transactional
 @Order(value = 2)
 public class WebCrawler implements CommandLineRunner {
 
@@ -55,6 +55,18 @@ public class WebCrawler implements CommandLineRunner {
     @Autowired
     WebDriverDownloader downloader;
 
+    @Autowired
+    ChinaPubRepository chinaPubRepository;
+
+    @Autowired
+    DangDangRepository dangDangRepository;
+
+    @Autowired
+    WinXuanRepository winXuanRepository;
+
+    @Autowired
+    ExecutorService executorService;
+
     final Class[] pageModels = {
             ChinaPub.class,
             WinXuan.class,
@@ -64,30 +76,22 @@ public class WebCrawler implements CommandLineRunner {
     public void start() {
         log.info(">>> start <<<");
 
-        int size = Runtime.getRuntime().availableProcessors() * 2;
-
-        ExecutorService executorService = Executors.newScheduledThreadPool(size);
-
         List<Spider> spiderList = Lists.newArrayList();
         for (Class pageModel : pageModels) {
             SeedUrl seedUrl = AnnotationUtils.findAnnotation(pageModel, SeedUrl.class);
             log.debug("seedUrl value= {}", Arrays.toString(seedUrl.value()));
-            String[] urls = new String[seedUrl.value().length];
 
-            //TODO 暂时在URL后面加时间，避免被redisScheduler判定为已经抓取过的
-            for (int index = 0; index < urls.length; index++) {
-                urls[index] = seedUrl.value()[index] + "?" + System.currentTimeMillis();
+            Request[] requests = new Request[seedUrl.value().length];
+            for (int index = 0; index < requests.length; index++) {
+                Request request = new Request(seedUrl.value()[index]);
+                request.putExtra("ignore", Boolean.TRUE);
+                requests[index] = request;
             }
 
             Spider spider = OOSpider.create(SiteUtil.get(), mongoPipeline, pageModel)
                     .setScheduler(redisScheduler)
-                    .addUrl(urls)
-                    .thread(executorService, size);
-
-            /*
-            if (pageModel.equals(WinXuan.class)) {
-                spider.setDownloader(downloader);
-            }*/
+                    .addRequest(requests)
+                    .thread(executorService, requests.length);
 
             spiderList.add(spider);
         }
@@ -99,19 +103,107 @@ public class WebCrawler implements CommandLineRunner {
         log.info(">>> end <<<");
     }
 
-    //@Scheduled(cron = "0 0/50 * * * ?")
-    public void task() {
-        start();
+    public void update() {
+        update(BookOrigin.WIN_XUAN);
+        update(BookOrigin.CHINA_PUB);
+        update(BookOrigin.DANG_DANG);
     }
 
-    public void winxuan() {
-        final int size = Runtime.getRuntime().availableProcessors() * 2;
+    public void update(BookOrigin origin) {
+        final int size = 10;
+        int totalPages;
+        Spider spider = null;
+        switch (origin) {
+            case CHINA_PUB:
+                spider = OOSpider.create(SiteUtil.get(), mongoPipeline, ChinaPub.class)
+                        .setScheduler(redisScheduler).thread(executorService, 1);
 
-        OOSpider.create(SiteUtil.get(), mongoPipeline, WinXuan.class)
-                //.setDownloader(downloader)
-                .addUrl("http://www.winxuan.com/")
-                .thread(Executors.newFixedThreadPool(size), size)
-                .run();
+                Page<ChinaPub> first = chinaPubRepository.findByCreateTimeIsNull(new PageRequest(0, size));
+                if (!first.hasContent()) {
+                    break;
+                }
+
+                totalPages = first.getTotalPages();
+                log.info("\t>>>\tCHINA_PUB\ttotal={}, total pages={}", first.getTotalElements(), totalPages);
+
+                for (int page = 0; page < totalPages; page++) {
+                    PageRequest pageRequest = new PageRequest(page, size);
+                    Page<ChinaPub> chinaPubPage = chinaPubRepository.findByCreateTimeIsNull(pageRequest);
+                    for (ChinaPub chinaPub : chinaPubPage) {
+                        Request request = new Request(chinaPub.getUrl());
+                        request.putExtra("ignore", Boolean.TRUE);
+                        spider.addRequest(request);
+                    }
+
+                    if (page > 1) {
+                        break;
+                    }
+                }
+
+                break;
+            case DANG_DANG:
+                spider = OOSpider.create(SiteUtil.get(), mongoPipeline, DangDang.class)
+                        .setScheduler(redisScheduler).thread(executorService, 1);
+
+                Page<DangDang> firstDangDangPage = dangDangRepository.findByCreateTimeIsNull(new PageRequest(0, size));
+                if (!firstDangDangPage.hasContent()) {
+                    break;
+                }
+
+                totalPages = firstDangDangPage.getTotalPages();
+                log.info("\t>>>\tDANG_DANG\ttotal={}, total pages={}", firstDangDangPage.getTotalElements(), totalPages);
+
+                for (int page = 0; page < totalPages; page++) {
+                    PageRequest pageRequest = new PageRequest(page, size);
+                    Page<DangDang> dangDangPage = dangDangRepository.findByCreateTimeIsNull(pageRequest);
+                    for (DangDang dangDang : dangDangPage) {
+                        Request request = new Request(dangDang.getUrl());
+                        request.putExtra("ignore", Boolean.TRUE);
+                        spider.addRequest(request);
+                    }
+
+                    if (page > 1) {
+                        break;
+                    }
+                }
+
+                break;
+            case WIN_XUAN:
+                spider = OOSpider.create(SiteUtil.get(), mongoPipeline, WinXuan.class)
+                        .setScheduler(redisScheduler).thread(executorService, 1);
+
+                Page<WinXuan> firstWinXuanPage = winXuanRepository.findByCreateTimeIsNull(new PageRequest(0, size));
+                if (!firstWinXuanPage.hasContent()) {
+                    break;
+                }
+
+                totalPages = firstWinXuanPage.getTotalPages();
+                log.info("\t>>>\tWIN_XUAN\ttotal={}, total pages={}", firstWinXuanPage.getTotalElements(), totalPages);
+
+                for (int page = 0; page < totalPages; page++) {
+                    PageRequest pageRequest = new PageRequest(page, size);
+                    Page<WinXuan> winXuanPage = winXuanRepository.findByCreateTimeIsNull(pageRequest);
+                    for (WinXuan winXuan : winXuanPage) {
+                        Request request = new Request(winXuan.getUrl());
+                        request.putExtra("ignore", Boolean.TRUE);
+                        spider.addRequest(request);
+                    }
+
+                    if (page > 1) {
+                        break;
+                    }
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        if (spider == null) {
+            return;
+        }
+        log.info("{} page count {}", origin, spider.getPageCount());
+        spider.runAsync();
     }
 
     @Override
@@ -122,8 +214,13 @@ public class WebCrawler implements CommandLineRunner {
                 case "start":
                     start();
                     break;
-                case "winxuan":
-                    winxuan();
+                case "updateChinaPub":
+                    update(BookOrigin.CHINA_PUB);
+                    break;
+                case "update":
+                    update();
+                    break;
+                default:
                     break;
             }
         }

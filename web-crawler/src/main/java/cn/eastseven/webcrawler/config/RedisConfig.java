@@ -1,5 +1,6 @@
 package cn.eastseven.webcrawler.config;
 
+import cn.eastseven.webcrawler.scheduler.RedisSchedulerExt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -19,8 +20,8 @@ public class RedisConfig {
     @Bean
     RedisScheduler redisScheduler() {
         JedisPoolConfig config = jedisConnectionFactory.getPoolConfig();
-        log.debug("{}", config);
-        log.debug("{}", jedisConnectionFactory.getPassword());
+        //log.debug("{}", config);
+        //log.debug("{}", jedisConnectionFactory.getPassword());
         JedisPool jedisPool = new JedisPool(config,
                 jedisConnectionFactory.getHostName(),
                 jedisConnectionFactory.getPort(),
@@ -28,7 +29,8 @@ public class RedisConfig {
                 jedisConnectionFactory.getPassword(),
                 jedisConnectionFactory.getDatabase());
 
-        RedisScheduler redisScheduler = new RedisScheduler(jedisPool);
+        //RedisScheduler redisScheduler = new RedisScheduler(jedisPool);
+        RedisSchedulerExt redisScheduler = new RedisSchedulerExt(jedisPool);
         return redisScheduler;
     }
 }

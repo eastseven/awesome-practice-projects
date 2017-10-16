@@ -21,7 +21,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Configuration
@@ -29,25 +29,29 @@ import java.util.concurrent.Executors;
 @EnableScheduling@Order(value=1)
 public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, CommandLineRunner {
 
-    @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(taskExecutor());
+    @Bean
+    ExecutorService executorService() {
+        final int size = Runtime.getRuntime().availableProcessors() * 4;
+        final int max = 50;
+        final int cap = 100;
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(size);
+        executor.setMaxPoolSize(max);
+        executor.setQueueCapacity(cap);
+        executor.setThreadNamePrefix("crawler-");
+        executor.initialize();
+        log.info("ThreadPoolTaskExecutor param >>> core {}, max {}, cap {}", size, max, cap);
+        return executor.getThreadPoolExecutor();
     }
 
-    @Bean
-    public Executor taskExecutor() {
-        return Executors.newScheduledThreadPool(100);
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.setScheduler(executorService());
     }
 
     @Override
     public Executor getAsyncExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("crawler-");
-        executor.initialize();
-        return executor;
+        return executorService();
     }
 
     @Override
@@ -64,36 +68,44 @@ public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, Command
     }
 
     @Value("${crawler.libs.phantomjs}")
-    String PATH_PHANTOMJS;
+    String PATH_PHANTOM_JS;
 
     @Value("${crawler.libs.selenium}")
     String PATH_CHROME;
 
     void load() {
-        String chromeDriverPath = "", phantomjsPath = "";
+        String chromeDriverPath = "";
+        String phantomJsPath = "";
         try {
-            Properties props = System.getProperties(); //获得系统属性集
-            String osName = props.getProperty("os.name"); //操作系统名称
+            //获得系统属性集
+            Properties props = System.getProperties();
+
+            //操作系统名称
+            String osName = props.getProperty("os.name");
+
+            final String OS_WIN = "win";
+            final String OS_MAC = "mac";
+
             String os = StringUtils.lowerCase(osName);
-            if (os.contains("win")) {
+            if (os.contains(OS_WIN)) {
                 chromeDriverPath = StringUtils.replace(PATH_CHROME, "#", "windows") + ".exe";
-                phantomjsPath = StringUtils.replace(PATH_PHANTOMJS, "#", "windows") + ".exe";
-            } else if (os.contains("mac")) {
+                phantomJsPath = StringUtils.replace(PATH_PHANTOM_JS, "#", "windows") + ".exe";
+            } else if (os.contains(OS_MAC)) {
                 chromeDriverPath = StringUtils.replace(PATH_CHROME, "#", "macosx");
-                phantomjsPath = StringUtils.replace(PATH_PHANTOMJS, "#", "macosx");
+                phantomJsPath = StringUtils.replace(PATH_PHANTOM_JS, "#", "macosx");
             } else {
                 chromeDriverPath = StringUtils.replace(PATH_CHROME, "#", "linux");
-                phantomjsPath = StringUtils.replace(PATH_PHANTOMJS, "#", "linux");
+                phantomJsPath = StringUtils.replace(PATH_PHANTOM_JS, "#", "linux");
             }
         } catch (Exception e) {
             log.error("", e);
         }
 
         System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY, chromeDriverPath);
-        System.setProperty(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomjsPath);
+        System.setProperty(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, phantomJsPath);
 
         log.info("{}", chromeDriverPath);
-        log.info("{}", phantomjsPath);
+        log.info("{}", phantomJsPath);
     }
 
     @Override

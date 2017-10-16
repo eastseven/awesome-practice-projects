@@ -19,7 +19,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 @HelpUrl("http://www.china-pub.com/*")
 @SeedUrl("http://www.china-pub.com/")
 @Document(collection = "book_china_pub")
-public class ChinaPub implements AfterExtractor {
+public class ChinaPub extends BaseBook implements AfterExtractor {
 
     @Id
     private String url;
@@ -33,27 +33,6 @@ public class ChinaPub implements AfterExtractor {
     @ExtractBy(value = "//span[@class='pro_buy_sen']/text()", notNull = true)
     private String price;
 
-    //@ExtractBy(value = "//div[@id='con_a_1']/div[@class='pro_r_deta']/ul/li/strong/text()")
-    private String isbn;
-
-    private String image;
-
-    private String info;
-
-    private String contents;
-
-    private String postDate; //上架时间：2016-11-8
-
-    private String publishDate; //出版日期 2017 年1月
-
-    private String originName;
-
-    private String translator; // 译者
-
-    private String author;
-
-    private String press; //出版社
-
     @Override
     public void afterProcess(Page page) {
         Element body = page.getHtml().getDocument().body();
@@ -64,7 +43,8 @@ public class ChinaPub implements AfterExtractor {
             Element contentTag = body.select("div#con_a_1 div.pro_r_deta h3#ml").first().siblingElements().first();
             this.contents = contentTag.html();
         } catch (Exception e) {
-            log.error("", e);
+            //log.error("", e);
+            log.error("get contents error, {}", url);
         }
 
         this.info = body.select("#con_a_1 > div:nth-child(1) > ul").html();
@@ -98,6 +78,11 @@ public class ChinaPub implements AfterExtractor {
             if (text.contains("ISBN：")) {
                 this.isbn = StringUtils.remove(text, "ISBN：");
             }
+
+            if (text.contains("所属分类：")) {
+                this.doCategory(li.select("span a.blue13"), BookOrigin.CHINA_PUB);
+            }
+
         }
     }
 }

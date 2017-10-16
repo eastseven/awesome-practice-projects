@@ -43,13 +43,13 @@ public class KanMeiJuTests {
                 //警察世家
                 //"http://www.kmeiju.net/archives/4200.html",
                 //妙探双姝 Rizzoli & Isles
-                "http://www.kmeiju.net/archives/4292.html",*/
-                "http://www.msj1.com/archives/989.html",
-//                "http://www.kmeiju.net/archives/986.html",
-//                "http://www.kmeiju.net/archives/983.html",
-//                "http://www.kmeiju.net/archives/980.html",
-//                "http://www.kmeiju.net/archives/977.html",
-//                "http://www.kmeiju.net/archives/974.html",
+                "http://www.kmeiju.net/archives/4292.html",
+                "http://www.msj1.com/archives/989.html",*/
+                "http://www.msj1.com/archives/986.html",
+//                "http://www.msj1.com/archives/983.html",
+//                "http://www.msj1.com/archives/980.html",
+//                "http://www.msj1.com/archives/977.html",
+//                "http://www.msj1.com/archives/974.html",
 
         };
 

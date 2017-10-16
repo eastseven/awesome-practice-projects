@@ -1,7 +1,8 @@
 logging:
   level:
     cn.eastseven.webcrawler: debug
-  file: dev.log
+    cn.eastseven.webcrawler.scheduler: error
+    us.codecraft.webmagic.downloader: error
 spring:
   jpa:
     hibernate:

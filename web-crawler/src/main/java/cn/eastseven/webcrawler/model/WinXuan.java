@@ -24,7 +24,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 })
 @SeedUrl("http://www.winxuan.com/")
 @Document(collection = "book_wen_xuan")
-public class WinXuan implements AfterExtractor {
+public class WinXuan extends BaseBook implements AfterExtractor {
 
     static final String PREFIX = "//div[@id='page']/div/div[@class='col-main']/div[@class='main-wrap']/div[@class='module']/div[@class='main-detail']/div[@class='cell-detail']/div[@class='info-main']";
 
@@ -39,20 +39,6 @@ public class WinXuan implements AfterExtractor {
 
     @ExtractBy(value = PREFIX + "/div[@class='attr']/dl[@class='price-n']/dd/b/text()", notNull = true)
     private String price;
-
-    private String isbn;
-
-    private String image;
-
-    private String info;
-
-    private String contents;
-
-    private String publishDate; //出版时间：2014-01-01 印刷时间：2014-01-01
-
-    private String author;
-
-    private String press; //出版社
 
     @Override
     public void afterProcess(Page page) {
@@ -86,5 +72,7 @@ public class WinXuan implements AfterExtractor {
         this.contents = body.select("div.unit.book-introduce div:nth-child(1) div.text-words-1").html();
 
         this.info = body.select("div.col-main > div > div:nth-child(3) > div > div > div.cont > ul").html();
+
+        this.doCategory(body.select("div.info-main > div.attr > dl.class > dd > a"), BookOrigin.WIN_XUAN);
     }
 }

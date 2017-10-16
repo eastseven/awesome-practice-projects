@@ -5,9 +5,22 @@ import us.codecraft.webmagic.Site;
 
 public final class SiteUtil {
 
-    final static String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36";
+    private SiteUtil() {
+        throw new IllegalStateException("Utility class");
+    }
 
-    final static String[] USER_AGENTS = {
+    public static final Site get() {
+        String userAgent = USER_AGENTS[RandomUtils.nextInt(0, USER_AGENTS.length - 1)];
+        return Site.me()
+                .setUserAgent(userAgent)
+                .setSleepTime(4321)
+                .setCycleRetryTimes(3)
+                .setTimeOut(30000)
+                .setRetrySleepTime(5432)
+                .setRetryTimes(3);
+    }
+
+    private static final String[] USER_AGENTS = {
             "Mozilla/5.0 (compatible; U; ABrowse 0.6; Syllable) AppleWebKit/420+ (KHTML, like Gecko)",
             "Mozilla/5.0 (compatible; U; ABrowse 0.6; Syllable) AppleWebKit/420+ (KHTML, like Gecko)",
             "Mozilla/5.0 (compatible; ABrowse 0.4; Syllable)",
@@ -7087,16 +7100,5 @@ public final class SiteUtil {
             "Opera/10.50 (Windows NT 6.1; U; en-GB) Presto/2.2.2",
             "Opera/9.80 (S60; SymbOS; Opera Tablet/9174; U; en) Presto/2.7.81 Version/10.5"
     };
-
-    public static final Site get() {
-        String userAgent = USER_AGENTS[RandomUtils.nextInt(0, USER_AGENTS.length - 1)];
-        return Site.me()
-                .setUserAgent(userAgent)
-                .setSleepTime(4321)
-                .setCycleRetryTimes(3)
-                .setTimeOut(30000)
-                .setRetrySleepTime(5432)
-                .setRetryTimes(3);
-    }
 
 }

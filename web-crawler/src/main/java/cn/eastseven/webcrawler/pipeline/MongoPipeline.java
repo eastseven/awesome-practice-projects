@@ -3,6 +3,7 @@ package cn.eastseven.webcrawler.pipeline;
 import cn.eastseven.webcrawler.model.ChinaPub;
 import cn.eastseven.webcrawler.model.DangDang;
 import cn.eastseven.webcrawler.model.WinXuan;
+import cn.eastseven.webcrawler.repository.BookCategoryRepository;
 import cn.eastseven.webcrawler.repository.ChinaPubRepository;
 import cn.eastseven.webcrawler.repository.DangDangRepository;
 import cn.eastseven.webcrawler.repository.WinXuanRepository;
@@ -25,23 +26,40 @@ public class MongoPipeline implements PageModelPipeline {
     @Autowired
     WinXuanRepository winXuanRepository;
 
+    @Autowired
+    BookCategoryRepository categoryRepository;
+
     @Override
-    public void process(Object o, Task task) {
-        //log.debug("= {} = {}", o.getClass(), o);
+    public void process(Object data, Task task) {
 
-        if (o instanceof DangDang) {
-            DangDang dangDang = dangDangRepository.save((DangDang) o);
-            log.info("当当 {}, {}, {}", dangDang.getName(), dangDang.getPrice(), dangDang.getUrl());
+        if (data instanceof DangDang) {
+            save((DangDang) data);
         }
 
-        if (o instanceof ChinaPub) {
-            ChinaPub chinaPub = chinaPubRepository.save((ChinaPub) o);
-            log.info("互动 {}, {}, {}", chinaPub.getName(), chinaPub.getPrice(), chinaPub.getUrl());
+        if (data instanceof ChinaPub) {
+            save((ChinaPub) data);
         }
 
-        if (o instanceof WinXuan) {
-            WinXuan winXuan = winXuanRepository.save((WinXuan) o);
-            log.info("文轩 {}, {}, {}", winXuan.getName(), winXuan.getPrice(), winXuan.getUrl());
+        if (data instanceof WinXuan) {
+            save((WinXuan) data);
         }
+    }
+
+    void save(DangDang data) {
+        dangDangRepository.save(data);
+        if (!data.getCategories().isEmpty()) categoryRepository.save(data.getCategories());
+        log.info("当当 {}, {}, {}", data.getName(), data.getPrice(), data.getUrl());
+    }
+
+    void save(ChinaPub data) {
+        chinaPubRepository.save(data);
+        if (!data.getCategories().isEmpty()) categoryRepository.save(data.getCategories());
+        log.info("互动 {}, {}, {}", data.getName(), data.getPrice(), data.getUrl());
+    }
+
+    void save(WinXuan data) {
+        winXuanRepository.save(data);
+        if (!data.getCategories().isEmpty()) categoryRepository.save(data.getCategories());
+        log.info("文轩 {}, {}, {}", data.getName(), data.getPrice(), data.getUrl());
     }
 }
