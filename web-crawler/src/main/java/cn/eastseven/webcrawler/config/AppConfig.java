@@ -22,18 +22,20 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Slf4j
 @Configuration
 @EnableAsync
-@EnableScheduling@Order(value=1)
+@EnableScheduling
+@Order(value = 1)
 public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, CommandLineRunner {
 
     @Bean
     ExecutorService executorService() {
         final int size = Runtime.getRuntime().availableProcessors() * 4;
-        final int max = 50;
-        final int cap = 100;
+        final int max = size * 2;
+        final int cap = max * 2;
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(size);
         executor.setMaxPoolSize(max);
@@ -46,7 +48,10 @@ public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, Command
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        taskRegistrar.setScheduler(executorService());
+        final int size = Runtime.getRuntime().availableProcessors() * 4;
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(size);
+        executor.setMaximumPoolSize(size * 2);
+        taskRegistrar.setScheduler(executor);
     }
 
     @Override

@@ -104,6 +104,8 @@ public class WebCrawler implements CommandLineRunner {
     }
 
     public void update() {
+
+
         update(BookOrigin.WIN_XUAN);
         update(BookOrigin.CHINA_PUB);
         update(BookOrigin.DANG_DANG);

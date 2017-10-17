@@ -16,7 +16,9 @@ public class RedisSchedulerExt extends RedisScheduler {
     @Override
     public boolean isDuplicate(Request request, Task task) {
         Object ignore = request.getExtra("ignore");
-        if (ignore != null && Boolean.TRUE.equals(ignore)) return false;
+        if (ignore != null && Boolean.TRUE.equals(ignore)) {
+            return false;
+        }
 
         boolean bln = super.isDuplicate(request, task);
         return bln;

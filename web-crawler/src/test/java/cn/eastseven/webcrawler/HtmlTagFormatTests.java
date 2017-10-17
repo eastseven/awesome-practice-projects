@@ -80,7 +80,7 @@ public class HtmlTagFormatTests {
     public void testHtmlTagReplace() throws Exception {
         String url = "http://www.chinaunicombidding.cn/jsp/cnceb/web/info1/detailNotice.jsp?id=2875703300000009139";
         String css = "body > div.Section1";
-        url = "http://www.ggzy.gov.cn/information/html/b/410000/0201/201710/13/00417acc0b17b3da4cd6aeebd5c0b0bddff6.shtml";
+        url = "http://www.ggzy.gov.cn/information/html/b/340000/0104/201710/13/003450d109974ea0444da15ee6ec1cabac71.shtml";
         css = "div#mycontent div.detail_content";
 
         Element body = Jsoup.connect(url).get().body();

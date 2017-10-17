@@ -25,8 +25,8 @@ public class WebCrawlerTests extends WebCrawlerApplicationTests {
     public void testUpdate() {
         Assert.assertNotNull(webCrawler);
         webCrawler.update(BookOrigin.WIN_XUAN);
-        webCrawler.update(BookOrigin.DANG_DANG);
-        webCrawler.update(BookOrigin.CHINA_PUB);
+        //webCrawler.update(BookOrigin.DANG_DANG);
+        //webCrawler.update(BookOrigin.CHINA_PUB);
     }
 
     @Test
