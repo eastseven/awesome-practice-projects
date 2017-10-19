@@ -34,4 +34,10 @@ public class WebCrawlerTests extends WebCrawlerApplicationTests {
         Assert.assertNotNull(webCrawlerStatistics);
         webCrawlerStatistics.count();
     }
+
+    @Test
+    public void testGgzy() {
+        Assert.assertNotNull(webCrawler);
+        webCrawler.ggzy();
+    }
 }
