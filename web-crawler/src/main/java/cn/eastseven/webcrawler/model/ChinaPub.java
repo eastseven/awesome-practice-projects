@@ -35,6 +35,13 @@ public class ChinaPub extends BaseBook implements AfterExtractor {
 
     @Override
     public void afterProcess(Page page) {
+        this.price = StringUtils.remove(this.price, "￥");
+        this.price = StringUtils.trim(this.price);
+
+        this.originPrice = StringUtils.remove(this.originPrice, "￥");
+        this.originPrice = StringUtils.substringBefore(this.originPrice, "(");
+        this.originPrice = StringUtils.trim(this.originPrice);
+
         Element body = page.getHtml().getDocument().body();
         this.url = page.getUrl().get();
         this.image = body.select("div.pro_book_img img").attr("src");
@@ -43,8 +50,7 @@ public class ChinaPub extends BaseBook implements AfterExtractor {
             Element contentTag = body.select("div#con_a_1 div.pro_r_deta h3#ml").first().siblingElements().first();
             this.contents = contentTag.html();
         } catch (Exception e) {
-            //log.error("", e);
-            log.error("get contents error, {}", url);
+            log.error("china-pub get contents fail, {}", url);
         }
 
         this.info = body.select("#con_a_1 > div:nth-child(1) > ul").html();

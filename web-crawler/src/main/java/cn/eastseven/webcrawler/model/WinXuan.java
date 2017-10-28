@@ -42,6 +42,11 @@ public class WinXuan extends BaseBook implements AfterExtractor {
 
     @Override
     public void afterProcess(Page page) {
+        this.price = StringUtils.remove(this.price, "￥");
+        this.price = StringUtils.trim(this.price);
+        this.originPrice = StringUtils.remove(this.originPrice, "￥");
+        this.originPrice = StringUtils.trim(this.originPrice);
+
         this.url = page.getUrl().get();
 
         Element body = page.getHtml().getDocument().body();
