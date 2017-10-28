@@ -12,28 +12,29 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Properties;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Slf4j
 @Configuration
 @EnableAsync
 @EnableScheduling
 @Order(value = 1)
-public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, CommandLineRunner {
+public class AppConfig implements AsyncConfigurer, CommandLineRunner {
+
+    final int size = Runtime.getRuntime().availableProcessors() * 4;
 
     @Bean
     ExecutorService executorService() {
-        final int size = Runtime.getRuntime().availableProcessors() * 4;
+
         final int max = size * 2;
         final int cap = max * 2;
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -46,12 +47,12 @@ public class AppConfig implements SchedulingConfigurer, AsyncConfigurer, Command
         return executor.getThreadPoolExecutor();
     }
 
-    @Override
-    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
-        final int size = Runtime.getRuntime().availableProcessors() * 4;
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(size);
-        executor.setMaximumPoolSize(size * 2);
-        taskRegistrar.setScheduler(executor);
+    @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(size);
+        taskScheduler.setThreadNamePrefix("crawler-task-");
+        return taskScheduler;
     }
 
     @Override

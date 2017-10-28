@@ -28,3 +28,4 @@ data/mongodb-data
 data/redis-data
 data/*.txt
 dev.log.*
+scp2home.sh
