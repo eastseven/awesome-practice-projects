@@ -16,6 +16,7 @@ import cn.eastseven.webcrawler.utils.SiteUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.util.Lists;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
@@ -38,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 @Slf4j
 @Service
 @Order(value = 2)
-public class WebCrawler implements CommandLineRunner {
+public class WebCrawler implements CommandLineRunner, DisposableBean {
 
     public static final String REQUEST_IGNORE = "ignore";
 
@@ -81,10 +82,10 @@ public class WebCrawler implements CommandLineRunner {
             DangDang.class
     };
 
+    private List<Spider> spiderList = Lists.newArrayList();
+
     public void start() {
         log.info(">>> start <<<");
-
-        List<Spider> spiderList = Lists.newArrayList();
         for (Class pageModel : pageModels) {
             SeedUrl seedUrl = AnnotationUtils.findAnnotation(pageModel, SeedUrl.class);
             log.debug("seedUrl value= {}", Arrays.toString(seedUrl.value()));
@@ -98,7 +99,7 @@ public class WebCrawler implements CommandLineRunner {
 
             Spider spider = OOSpider.create(SiteUtil.get(), mongoPipeline, pageModel)
                     .setScheduler(redisScheduler)
-                    .addRequest(requests)
+                    .addRequest(requests).setExitWhenComplete(true)
                     .thread(executorService, requests.length);
 
             spiderList.add(spider);
@@ -266,5 +267,18 @@ public class WebCrawler implements CommandLineRunner {
         spider.addPipeline(context.getBean(GongGongZiYuanPipeline.class));
 
         spider.run();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        for (Spider spider : spiderList) {
+            if (spider.getStatus().equals(Spider.Status.Running)) {
+                spider.stop();
+            }
+
+            Thread.sleep(1234L);
+
+            spider.close();
+        }
     }
 }
