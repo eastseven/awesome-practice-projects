@@ -16,7 +16,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 @Data
 @Slf4j
 @TargetUrl("http://product.china-pub.com/\\d+")
-@HelpUrl("http://www.china-pub.com/*")
+@HelpUrl({"http://www.china-pub.com/*", "http://product.china-pub.com/cache/browse2/*"})
 @SeedUrl("http://www.china-pub.com/")
 @Document(collection = "book_china_pub")
 public class ChinaPub extends BaseBook implements AfterExtractor {
@@ -44,6 +44,7 @@ public class ChinaPub extends BaseBook implements AfterExtractor {
 
         Element body = page.getHtml().getDocument().body();
         this.url = page.getUrl().get();
+        log.debug(">>> {}", this.url);
         this.image = body.select("div.pro_book_img img").attr("src");
 
         try {

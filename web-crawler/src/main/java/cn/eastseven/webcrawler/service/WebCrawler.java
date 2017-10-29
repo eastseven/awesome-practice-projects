@@ -1,19 +1,18 @@
-package cn.eastseven.webcrawler;
+package cn.eastseven.webcrawler.service;
 
-import cn.eastseven.webcrawler.downloader.WebDriverDownloader;
 import cn.eastseven.webcrawler.model.*;
-import cn.eastseven.webcrawler.pipeline.ChinaPubPipeline;
 import cn.eastseven.webcrawler.pipeline.GongGongZiYuanPipeline;
 import cn.eastseven.webcrawler.pipeline.MongoPipeline;
-import cn.eastseven.webcrawler.pipeline.WinXuanPipeline;
 import cn.eastseven.webcrawler.processor.GongGongZiYuanPageProcessor;
+import cn.eastseven.webcrawler.repository.BookCategoryRepository;
 import cn.eastseven.webcrawler.repository.ChinaPubRepository;
 import cn.eastseven.webcrawler.repository.DangDangRepository;
 import cn.eastseven.webcrawler.repository.WinXuanRepository;
-import cn.eastseven.webcrawler.service.ProxyService;
 import cn.eastseven.webcrawler.utils.GongGongZiYuanUtil;
 import cn.eastseven.webcrawler.utils.SiteUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.assertj.core.util.Lists;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.DisposableBean;
@@ -24,6 +23,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
@@ -32,9 +32,11 @@ import us.codecraft.webmagic.model.OOSpider;
 import us.codecraft.webmagic.scheduler.RedisScheduler;
 import us.codecraft.webmagic.utils.HttpConstant;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,19 +52,10 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
     ProxyService proxyService;
 
     @Autowired
-    ChinaPubPipeline chinaPubPipeline;
-
-    @Autowired
-    WinXuanPipeline winXuanPipeline;
-
-    @Autowired
     RedisScheduler redisScheduler;
 
     @Autowired
     MongoPipeline mongoPipeline;
-
-    @Autowired
-    WebDriverDownloader downloader;
 
     @Autowired
     ChinaPubRepository chinaPubRepository;
@@ -74,7 +67,9 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
     WinXuanRepository winXuanRepository;
 
     @Autowired
-    ExecutorService executorService;
+    BookCategoryRepository categoryRepository;
+
+    ExecutorService spiderExecutorService;
 
     final Class[] pageModels = {
             ChinaPub.class,
@@ -82,10 +77,36 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
             DangDang.class
     };
 
+    final BookOrigin[] origins = {
+            BookOrigin.CHINA_PUB,
+            BookOrigin.WIN_XUAN,
+            BookOrigin.DANG_DANG
+    };
+
     private List<Spider> spiderList = Lists.newArrayList();
 
-    public void start() {
-        log.info(">>> start <<<");
+    public List<Spider> getSpiderList() {
+        return spiderList;
+    }
+
+    private ExecutorService initExecutorService() {
+        final int size = Runtime.getRuntime().availableProcessors();
+        final int max = size * size;
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(size);
+        executor.setMaxPoolSize(max);
+        executor.setThreadNamePrefix("crawler-");
+        executor.initialize();
+        log.info("ThreadPoolTaskExecutor param >>> core {}, max {}", size, max);
+        spiderExecutorService = executor.getThreadPoolExecutor();
+
+        return spiderExecutorService;
+    }
+
+    @PostConstruct
+    public void init() {
+        initExecutorService();
+
         for (Class pageModel : pageModels) {
             SeedUrl seedUrl = AnnotationUtils.findAnnotation(pageModel, SeedUrl.class);
             log.debug("seedUrl value= {}", Arrays.toString(seedUrl.value()));
@@ -96,19 +117,59 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
                 request.putExtra("ignore", Boolean.TRUE);
                 requests[index] = request;
             }
-
-            Spider spider = OOSpider.create(SiteUtil.get(), mongoPipeline, pageModel)
-                    .setScheduler(redisScheduler)
-                    .addRequest(requests).setExitWhenComplete(true)
-                    .thread(executorService, requests.length);
-
+            Spider spider = getSpider(pageModel);
+            spider.addRequest(requests);
+            spider.setUUID("book-spider-" + pageModel.getSimpleName().toLowerCase());
             spiderList.add(spider);
         }
 
+        for (BookOrigin origin : origins) {
+            List<BookCategory> bookCategoryList = categoryRepository.findByOrigin(origin);
+            if (CollectionUtils.isEmpty(bookCategoryList)) continue;
+
+            Class pageModel = null;
+            switch (origin) {
+                case CHINA_PUB:
+                    pageModel = ChinaPub.class;
+                    break;
+                case WIN_XUAN:
+                    pageModel = WinXuan.class;
+                    break;
+                case DANG_DANG:
+                    pageModel = DangDang.class;
+                    break;
+                default:
+                    break;
+            }
+
+            Spider spider = getSpider(pageModel);
+            spider.setUUID("book-category-spider-" + pageModel.getSimpleName().toLowerCase());
+
+            List<Request> requests = bookCategoryList.stream().map(category -> {
+                Request request = new Request(category.getUrl());
+                request.putExtra(REQUEST_IGNORE, Boolean.TRUE);
+                return request;
+            }).collect(Collectors.toList());
+
+            spider.addRequest(requests.get(RandomUtils.nextInt(0, requests.size() - 1)));
+
+            spiderList.add(spider);
+        }
+    }
+
+    private Spider getSpider(Class pageModel) {
+        return OOSpider.create(SiteUtil.get(), mongoPipeline, pageModel)
+                .setScheduler(redisScheduler)
+                .setExitWhenComplete(false)
+                .thread(Runtime.getRuntime().availableProcessors() * 4)
+                .setExecutorService(spiderExecutorService);
+    }
+
+    public void start() {
+        log.info(">>> start <<<");
         for (Spider spider : spiderList) {
             spider.start();
         }
-
         log.info(">>> end <<<");
     }
 
@@ -125,7 +186,7 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
         switch (origin) {
             case CHINA_PUB:
                 spider = OOSpider.create(SiteUtil.get(), mongoPipeline, ChinaPub.class)
-                        .setScheduler(redisScheduler).thread(executorService, 1);
+                        .setScheduler(redisScheduler).thread(spiderExecutorService, 1);
 
                 Page<ChinaPub> first = chinaPubRepository.findByCreateTimeIsNull(new PageRequest(0, size));
                 if (!first.hasContent()) {
@@ -152,7 +213,7 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
                 break;
             case DANG_DANG:
                 spider = OOSpider.create(SiteUtil.get(), mongoPipeline, DangDang.class)
-                        .setScheduler(redisScheduler).thread(executorService, 1);
+                        .setScheduler(redisScheduler).thread(spiderExecutorService, 1);
 
                 Page<DangDang> firstDangDangPage = dangDangRepository.findByCreateTimeIsNull(new PageRequest(0, size));
                 if (!firstDangDangPage.hasContent()) {
@@ -179,7 +240,7 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
                 break;
             case WIN_XUAN:
                 spider = OOSpider.create(SiteUtil.get(), mongoPipeline, WinXuan.class)
-                        .setScheduler(redisScheduler).thread(executorService, 1);
+                        .setScheduler(redisScheduler).thread(spiderExecutorService, 1);
 
                 Page<WinXuan> firstWinXuanPage = winXuanRepository.findByCreateTimeIsNull(new PageRequest(0, size));
                 if (!firstWinXuanPage.hasContent()) {
@@ -212,7 +273,9 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
             return;
         }
         log.info("{} page count {}", origin, spider.getPageCount());
-        spider.runAsync();
+        spider.setUUID("book-spider-update-" + origin.name().toLowerCase());
+        spiderList.add(spider);
+        spider.start();
     }
 
     @Override
@@ -253,7 +316,7 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
             requests[day] = request;
         }
         spider.addRequest(requests);
-        spider.thread(executorService, 32);
+        spider.thread(spiderExecutorService, 32);
         /*String date = "2017-10-01";//DateTime.now().minusDays(day).toString("yyyy-MM-dd");
         Request request = new Request("http://deal.ggzy.gov.cn/ds/deal/dealList.jsp");
         request.putExtra(REQUEST_IGNORE, Boolean.TRUE);
@@ -278,7 +341,9 @@ public class WebCrawler implements CommandLineRunner, DisposableBean {
 
             Thread.sleep(1234L);
 
-            spider.close();
+            if (spider.getStatus().equals(Spider.Status.Stopped)) {
+                spider.close();
+            }
         }
     }
 }

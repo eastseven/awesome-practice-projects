@@ -1,4 +1,4 @@
-package cn.eastseven.webcrawler;
+package cn.eastseven.webcrawler.service;
 
 import cn.eastseven.webcrawler.model.BookCount;
 import cn.eastseven.webcrawler.repository.BookCountRepository;

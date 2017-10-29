@@ -16,7 +16,7 @@ import us.codecraft.webmagic.model.annotation.TargetUrl;
 @Data
 @Slf4j
 @TargetUrl("http://product.dangdang.com/\\d+.html")
-@HelpUrl("http://book.dangdang.com/*")
+@HelpUrl({"http://book.dangdang.com/*", "http://category.dangdang.com/*"})
 @SeedUrl("http://book.dangdang.com/")
 @Document(collection = "book_dang_dang")
 public class DangDang extends BaseBook implements AfterExtractor {

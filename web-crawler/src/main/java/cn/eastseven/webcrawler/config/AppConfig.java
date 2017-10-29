@@ -6,63 +6,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.AsyncConfigurer;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import java.util.Properties;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 
 @Slf4j
 @Configuration
-@EnableAsync
+//@EnableAsync
 @EnableScheduling
 @Order(value = 1)
-public class AppConfig implements AsyncConfigurer, CommandLineRunner {
-
-    final int size = Runtime.getRuntime().availableProcessors() * 4;
-
-    @Bean
-    ExecutorService executorService() {
-
-        final int max = size * 2;
-        final int cap = max * 2;
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(size);
-        executor.setMaxPoolSize(max);
-        executor.setQueueCapacity(cap);
-        executor.setThreadNamePrefix("crawler-");
-        executor.initialize();
-        log.info("ThreadPoolTaskExecutor param >>> core {}, max {}, cap {}", size, max, cap);
-        return executor.getThreadPoolExecutor();
-    }
+public class AppConfig implements CommandLineRunner {
 
     @Bean
     public TaskScheduler taskScheduler() {
         ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-        taskScheduler.setPoolSize(size);
+        taskScheduler.setPoolSize(Runtime.getRuntime().availableProcessors() * 2);
         taskScheduler.setThreadNamePrefix("crawler-task-");
+        log.info(">>> TaskScheduler init");
         return taskScheduler;
-    }
-
-    @Override
-    public Executor getAsyncExecutor() {
-        return executorService();
-    }
-
-    @Override
-    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return null;
     }
 
     @Bean

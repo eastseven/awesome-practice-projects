@@ -10,7 +10,7 @@ spring:
     show-sql: false
     generate-ddl: true
   redis:
-    host: localhost
+    host: 192.168.3.108
     port: 6379
     password: 123456
     pool:
@@ -20,15 +20,15 @@ spring:
       max-active: 16
   data:
     mongodb:
-      host: localhost
+      host: 192.168.3.108
       port: 27017
       database: crawler
   application:
     name: web-crawler
 
 app.proxy.pool:
-  url: http://www.eastseven.cn:5000/get/
-  urls: http://www.eastseven.cn:5000/get_all/
+  url: http://192.168.3.117:5000/get/
+  urls: http://192.168.3.117:5000/get_all/
 
 crawler.libs:
   phantomjs: libs/phantomjs/#/phantomjs
