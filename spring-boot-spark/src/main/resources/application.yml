@@ -1,0 +1,22 @@
+logging:
+  level:
+    org.apache.zookeeper: error
+    cn.eastseven.spark: debug
+  file: target/a.log
+
+app.industry.categories.file.path: /Users/dongqi/Downloads/行业分类.xlsx
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://192.168.3.108:27017/IndustryCategories
+
+hbase.zookeeper.quorum: s97,s98,s99
+hbase:
+  namespace: bid_news_test
+  table:
+    original: bid_news_original
+    history: bid_news_original_history
+    analysis: bid_news_analysis
+    company: bid_news_company
+    project: bid_news_project
