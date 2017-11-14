@@ -41,11 +41,15 @@ public class SparkHBaseService {
                 .getOrCreate();
 
         javaSparkContext = new JavaSparkContext(spark.sparkContext());
+        log.info("JavaSparkContent {}, init", javaSparkContext);
     }
 
     @PreDestroy
     public void destroy() {
-        if (javaSparkContext != null) javaSparkContext.close();
+        if (javaSparkContext != null) {
+            log.info("JavaSparkContent {}, close", javaSparkContext);
+            javaSparkContext.close();
+        }
     }
 
     public JavaSparkContext getJavaSparkContext() {

@@ -2,12 +2,14 @@ package cn.eastseven.spark.dao;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
+/**
+ * @author eastseven
+ */
 @Data
-@Document(collection = "bidding_article")
+//@Document(collection = "bidding_article")
 public class BiddingArticle implements Serializable {
 
     @Id

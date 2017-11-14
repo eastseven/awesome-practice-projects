@@ -9,7 +9,7 @@ app.industry.categories.file.path: /Users/dongqi/Downloads/行业分类.xlsx
 spring:
   data:
     mongodb:
-      uri: mongodb://192.168.3.108:27017/IndustryCategories
+      uri: mongodb://business:iIh1RRep@192.168.3.226:60000/business
 
 hbase.zookeeper.quorum: s94,s95,s96
 hbase:
