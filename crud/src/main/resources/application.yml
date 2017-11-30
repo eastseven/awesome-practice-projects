@@ -1,3 +1,4 @@
+
 logging:
   level:
     cn.eastseven.crud: debug
@@ -8,3 +9,5 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+server:
+  port: 9527

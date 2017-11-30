@@ -1,6 +1,7 @@
 package cn.eastseven.crud;
 
 import cn.binarywang.tools.generator.ChineseMobileNumberGenerator;
+import cn.binarywang.tools.generator.ChineseNameGenerator;
 import cn.eastseven.crud.model.Customer;
 import cn.eastseven.crud.repository.CustomerRepository;
 import com.google.common.collect.Lists;
@@ -39,6 +40,7 @@ public class CrudApplication implements CommandLineRunner {
             Customer customer = Customer.builder()
                     .createTime(DateTime.now().plusMinutes(RandomUtils.nextInt(1, 999999)).toDate())
                     .email(RandomStringUtils.randomAlphabetic(5) + "@test.com")
+                    .name(ChineseNameGenerator.getInstance().generate())
                     .firstName(RandomStringUtils.randomAlphabetic(5)).lastName(RandomStringUtils.randomAlphabetic(5))
                     .username(RandomStringUtils.randomAlphabetic(5))
                     .mobile(ChineseMobileNumberGenerator.getInstance().generateFake())

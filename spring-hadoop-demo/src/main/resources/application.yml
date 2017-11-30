@@ -4,6 +4,6 @@ logging:
 
 spring:
   hadoop:
-    fs-uri: hdfs://192.168.3.91:9000
+    fs-uri: hdfs://192.168.3.94:9000
   profiles:
     include: hbase, gen

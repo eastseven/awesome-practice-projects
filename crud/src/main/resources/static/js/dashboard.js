@@ -119,7 +119,7 @@ function view(button) {
 
 var customerColumns = [
     {'data': 'id'},
-    {'data': 'image'},
+    {'data': 'name'},
     {'data': 'username'},
     {'data': 'createTime'},
     {'data': 'firstName'},
@@ -128,7 +128,6 @@ var customerColumns = [
     {'data': 'email'},
     {
         'data': 'status', render: function (data, type, row) {
-        //console.log(data, row);
         return data;
     }
     },
@@ -160,5 +159,12 @@ $(document).ready(function () {
             }
         },
         'order': [[0, 'desc']]
+    });
+
+    $('#combo-query-form form').submit(function (event) {
+        var url = '/data/customers?' + $(this).serialize();
+        console.log('query url', url);
+        table.ajax.url(url).load();
+        event.preventDefault();
     });
 });

@@ -12,13 +12,17 @@ import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data@Builder@NoArgsConstructor@AllArgsConstructor
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "t_customer")
 public class Customer {
 
     @JsonView(DataTablesOutput.View.class)
-    @Id@GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @JsonView(DataTablesOutput.View.class)
@@ -30,6 +34,9 @@ public class Customer {
     @Temporal(value = TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
+
+    @JsonView(DataTablesOutput.View.class)
+    private String name;
 
     @JsonView(DataTablesOutput.View.class)
     private String firstName;
@@ -66,8 +73,10 @@ public class Customer {
         @JsonValue
         public String getText() {
             switch (this.code) {
-                case 0: return "无效";
-                case 1: return "有效";
+                case 0:
+                    return "无效";
+                case 1:
+                    return "有效";
             }
 
             return "未知";

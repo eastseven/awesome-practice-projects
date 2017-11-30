@@ -3,6 +3,7 @@ package cn.eastseven.webcrawler.model;
 import com.google.common.collect.Sets;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.joda.time.DateTime;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,7 +13,9 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.Set;
 
-@Getter@Setter
+@Getter
+@Setter
+@ToString
 public class BaseBook {
 
     protected long createTime = DateTime.now().getMillis();
@@ -61,9 +64,15 @@ public class BaseBook {
             this.categories.add(category);
 
             switch (index) {
-                case 0: this.category1 = value; break;
-                case 1: this.category2 = value; break;
-                case 2: this.category3 = value; break;
+                case 0:
+                    this.category1 = value;
+                    break;
+                case 1:
+                    this.category2 = value;
+                    break;
+                case 2:
+                    this.category3 = value;
+                    break;
             }
 
             this.category = category;

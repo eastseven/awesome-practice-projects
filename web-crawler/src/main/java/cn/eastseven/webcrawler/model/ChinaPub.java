@@ -36,6 +36,7 @@ public class ChinaPub extends BaseBook implements AfterExtractor {
     @Override
     public void afterProcess(Page page) {
         this.price = StringUtils.remove(this.price, "￥");
+        this.price = StringUtils.substringBefore(this.price, "(");
         this.price = StringUtils.trim(this.price);
 
         this.originPrice = StringUtils.remove(this.originPrice, "￥");

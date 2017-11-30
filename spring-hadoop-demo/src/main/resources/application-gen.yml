@@ -1,10 +1,16 @@
 gen.entity: |
   {
     "packageName": "cn.eastseven.hadoop.demo",
-    "className": "CompanyNameIdcode",
-    "tableName": "company_name_idcode",
+    "className": "UrlData",
+    "tableName": "url_data",
     "properties": [
-      {"name": "company_id", "type": "String"},
-      {"name": "company_name", "type": "String"},
+      {"name": "id", "type": "String"},
+      {"name": "url", "type": "String"},
+      {"name": "title", "type": "String"},
+      {"name": "origin", "type": "String"},
+      {"name": "seed", "type": "String"},
+      {"name": "createTime", "type": "long"},
+      {"name": "status", "type": "String"},
+      {"name": "processorName", "type": "String"},
     ]
   }

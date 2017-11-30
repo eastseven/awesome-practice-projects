@@ -32,7 +32,6 @@ public class KeyWordsProperties {
     public void init() throws Exception {
         log.info("app.industry.categories.file.path = {}", path);
 
-
         Workbook workbook = WorkbookFactory.create(Paths.get(path).toFile());
         Sheet sheet = workbook.getSheetAt(0);
         Row firstRow = sheet.getRow(0);
@@ -40,9 +39,6 @@ public class KeyWordsProperties {
         List<Cell> cellList = Lists.newArrayList(firstRow.cellIterator())
                 .stream().filter(cell -> StringUtils.isNotBlank(cell.getStringCellValue())).collect(Collectors.toList());
         Map<Integer, String> categoryMap = cellList.stream().collect(Collectors.toMap(cell -> cell.getColumnIndex(), cell -> ""));
-
-        log.debug("getPhysicalNumberOfCells={}, {}", firstRow.getPhysicalNumberOfCells(), cellList.size());
-        log.debug("getPhysicalNumberOfRows={}, getLastRowNum={}", sheet.getPhysicalNumberOfRows(), sheet.getLastRowNum());
 
         List<Row> rowList = Lists.newArrayList(sheet.rowIterator()).stream().filter(row -> row.getRowNum() > 0).collect(Collectors.toList());
         rowList.forEach(row -> {
@@ -54,13 +50,9 @@ public class KeyWordsProperties {
             }
         });
 
-        categoryMap.forEach((k, v) -> log.debug("{}, {}", k, v));
-
         keyWordsMap = cellList.stream()
                 .collect(Collectors.toMap(cell -> cell.getStringCellValue(),
                         cell -> categoryMap.get(cell.getColumnIndex()).replaceFirst(",", "").split(",")));
-
-        keyWordsMap.forEach((k, v) -> log.debug(">>> {}, {}", k, v));
 
         workbook.close();
     }

@@ -16,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,6 +32,7 @@ public class MongodbTests {
     private String bid_news_company = "bid_news_company";
     private String bid_news_project = "bid_news_project";
 
+    //mvn test -Dtest=MongodbTests#test -Dspring.profiles.active=prod -Paliyun
     @Test
     public void test() {
         Assert.assertNotNull(mongoTemplate);
@@ -40,19 +42,19 @@ public class MongodbTests {
 
         map.forEach((k,v) -> log.debug("{}, {}", k, v));
 
-        List<String> companyIdList = Lists.newArrayList();
+        log.info(">>> ===== start =====");
         DBCursor cursor = mongoTemplate.getCollection(bid_news_analysis).find();
-        while (cursor.hasNext()) {
-            DBObject dbObject = cursor.next();
-            Object id = dbObject.get("_id");
-            Object projectId = dbObject.get("same_bid_id");
-            if (projectId == null) {
-                companyIdList.add(id.toString());
-                mongoTemplate.getCollection(bid_news_analysis).remove(dbObject);
-                log.debug("remove {} same_bid_id is null in bid_news_company", id);
-            }
-        }
-
-        log.debug(">>> name is null in bid_news_company, size {}", companyIdList.size());
+        log.info(">>> ===== 1 =====");
+        List<DBObject> list = Lists.newArrayList(cursor.iterator());
+        log.info(">>> ===== 2 =====");
+        Set<String> projectIds = list.stream().map(row -> row.get("same_bid_id").toString()).collect(Collectors.toSet());
+        log.info(">>> ===== 3 =====");
+        List<DBObject> projectList = Lists.newArrayList(mongoTemplate.getCollection(bid_news_project).find().iterator());
+        log.info(">>> ===== 4 =====");
+        Set<String> allProjectIds = projectList.stream().map(row -> row.get("_id").toString()).collect(Collectors.toSet());
+        log.info(">>> ===== 5 =====");
+        Set<String> notExistsProjectIds = projectIds.stream().filter(projectId -> !allProjectIds.contains(projectId)).collect(Collectors.toSet());
+        log.info(">>> ===== 6 =====");
+        log.debug(">>> bid_news_analysis size {}, bid_news_project size {}, not exists size {}", projectIds.size(), allProjectIds.size(), notExistsProjectIds.size());
     }
 }

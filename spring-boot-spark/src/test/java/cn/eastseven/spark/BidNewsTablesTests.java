@@ -2,7 +2,7 @@ package cn.eastseven.spark;
 
 import cn.eastseven.spark.config.HBaseConfig;
 import cn.eastseven.spark.model.SourceCode;
-import cn.eastseven.spark.service.SparkHBaseService;
+import cn.eastseven.spark.service.SparkService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -22,6 +22,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.apache.hadoop.hbase.filter.CompareFilter.CompareOp.EQUAL;
 import static org.junit.Assert.assertNotNull;
@@ -33,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 public class BidNewsTablesTests {
 
     @Autowired
-    SparkHBaseService service;
+    SparkService service;
 
     @Autowired
     HBaseConfig config;
@@ -198,11 +201,34 @@ public class BidNewsTablesTests {
      */
     @Test
     public void testAnalysisAndProjectAndCompany() throws Exception {
-        Scan scan = new Scan();
+        FilterList filterList = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+        filterList.addFilter(new FirstKeyOnlyFilter());
 
+        final byte[] f = "f".getBytes();
+        final byte[] title = "title".getBytes();
+        final byte[] url = "url".getBytes();
+        Scan analysisScan = new Scan();
+        analysisScan.addFamily(f);
+        analysisScan.addColumn(f, "same_bid_id".getBytes());
+        analysisScan.setFilter(filterList);
 
-        JavaPairRDD<ImmutableBytesWritable, Result> rdd = service.getHBaseResultJavaPairRDD(config.getTableAnalysis(), scan);
-        log.debug(">>> count {} {}", config.getTableAnalysis().getNameWithNamespaceInclAsString(), rdd.count());
+        JavaPairRDD<ImmutableBytesWritable, Result> analysisRDD = service.getHBaseResultJavaPairRDD(config.getTableAnalysis(), analysisScan);
+        log.info(">>> count {} {}", config.getTableAnalysis().getNameWithNamespaceInclAsString(), analysisRDD.count());
 
+        Scan projectScan = new Scan();
+        projectScan.addFamily(f);
+        projectScan.addColumn(f, "_id".getBytes());
+        projectScan.setFilter(filterList);
+        JavaPairRDD<ImmutableBytesWritable, Result> projectRDD = service.getHBaseResultJavaPairRDD(config.getTableProject(), projectScan);
+        log.info(">>> count {} {}", config.getTableProject().getNameWithNamespaceInclAsString(), projectRDD.count());
+
+        JavaRDD<String> projectIdRDD = projectRDD.map(row -> Bytes.toString(row._1.get())).distinct().cache();
+        List<String> projectIdList = projectIdRDD.collect();
+
+        JavaRDD<String> needRemoveAnalysisIdRDD = analysisRDD.filter(row -> !projectIdList.contains(Bytes.toString(row._2.getValue(f, "same_bid_id".getBytes()))))
+                .map(row -> Bytes.toString(row._1.get())).distinct().cache();
+
+        log.info(">>> {} 问题数据 {} 条", config.getTableAnalysis().getNameWithNamespaceInclAsString(), needRemoveAnalysisIdRDD.count());
+        needRemoveAnalysisIdRDD.saveAsTextFile("spark-warehouse/needRemoveAnalysisId");
     }
 }

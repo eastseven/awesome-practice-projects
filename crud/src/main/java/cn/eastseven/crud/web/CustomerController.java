@@ -2,6 +2,7 @@ package cn.eastseven.crud.web;
 
 import cn.eastseven.crud.model.Customer;
 import cn.eastseven.crud.model.CustomerForm;
+import cn.eastseven.crud.model.CustomerSearchForm;
 import cn.eastseven.crud.service.CustomerService;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Maps;
@@ -24,9 +25,11 @@ public class CustomerController {
     CustomerService customerService;
 
     @JsonView(DataTablesOutput.View.class)
-    @PostMapping("/data/customers")@ResponseBody
-    public DataTablesOutput<Customer> retrieve(@Valid @RequestBody DataTablesInput input) {
-        return customerService.retrieve(input);
+    @PostMapping("/data/customers")
+    @ResponseBody
+    public DataTablesOutput<Customer> retrieve(@Valid @RequestBody DataTablesInput input, CustomerSearchForm searchForm) {
+        log.debug("{}", searchForm);
+        return customerService.retrieve(input, searchForm);
     }
 
     @GetMapping("/customer/add")
@@ -35,7 +38,8 @@ public class CustomerController {
         return "customer-form";
     }
 
-    @PostMapping("/customer/add")@ResponseBody
+    @PostMapping("/customer/add")
+    @ResponseBody
     public Object add(CustomerForm form) {
         log.debug("add {}", form);
         Map<String, Object> response = Maps.newHashMap();
@@ -63,7 +67,8 @@ public class CustomerController {
         return "customer-form";
     }
 
-    @PostMapping("/customer/edit")@ResponseBody
+    @PostMapping("/customer/edit")
+    @ResponseBody
     public Object edit(CustomerForm form) {
         log.debug("edit {}", form);
         Map<String, Object> response = Maps.newHashMap();
@@ -77,7 +82,8 @@ public class CustomerController {
         return response;
     }
 
-    @GetMapping("/customer/delete/{id}")@ResponseBody
+    @GetMapping("/customer/delete/{id}")
+    @ResponseBody
     public Object del(@PathVariable long id) {
         Map<String, Object> response = Maps.newHashMap();
 

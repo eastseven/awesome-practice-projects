@@ -10,10 +10,12 @@ import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.protobuf.ProtobufUtil;
 import org.apache.hadoop.hbase.util.Base64;
+import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -25,7 +27,13 @@ import java.io.IOException;
  */
 @Slf4j
 @Service
-public class SparkHBaseService {
+public class SparkService {
+
+    @Value("${spring.data.mongodb.uri}") String uri;
+
+    public static final String bid_news_analysis = "bid_news_analysis";
+    public static final String bid_news_project = "bid_news_project";
+    public static final String bid_news_company = "bid_news_company";
 
     @Autowired
     HBaseConfig hbaseConfig;
@@ -36,12 +44,15 @@ public class SparkHBaseService {
     public void init() {
         SparkSession spark = SparkSession.builder()
                 .master("local")
-                .appName("SparkHBaseService")
+                .appName("SparkHBaseMongoService")
                 .config("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                .config("spark.mongodb.input.uri", String.join(".", uri, bid_news_analysis))
+                .config("spark.mongodb.output.uri", String.join(".", uri, bid_news_analysis))
                 .getOrCreate();
 
         javaSparkContext = new JavaSparkContext(spark.sparkContext());
         log.info("JavaSparkContent {}, init", javaSparkContext);
+
     }
 
     @PreDestroy
