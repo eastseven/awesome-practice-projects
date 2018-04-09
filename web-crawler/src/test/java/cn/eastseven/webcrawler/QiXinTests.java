@@ -22,7 +22,7 @@ public class QiXinTests {
         WebDriver driver = new PhantomJSDriver(caps);
         Assert.assertNotNull(driver);
 
-        driver.get("http://www.qixin.com/auth/login");
+        driver.get("http://c.pingan.com/apply/newpublic/credit_card_query/index.html#index");
         //driver.get("http://www.msj1.com/kanmeiju-ed2k");
         try {
             Thread.sleep(1000L);
@@ -31,6 +31,8 @@ public class QiXinTests {
         }
         System.out.println(">>> 1 <<< \n"+driver.getPageSource());
 
+        driver.findElement(By.id("idNo")).sendKeys("510107201504290162");
+        driver.findElement(By.id("idNo")).sendKeys("510107201504290162");
         /*
         driver.findElement(By.id("s1-0[0]-0[0]-account")).sendKeys("17380678381");
         driver.findElement(By.id("s1-0[0]-0[0]-password")).sendKeys("dq123456");

@@ -241,9 +241,11 @@ public class SparkTests extends ParentTests {
     public void testCountOriginalTableDailyBySourceCode() throws Exception {
         TableName original = TableName.valueOf("bid_news", "bid_news_original");
 
-        String day = "20171206";
+        String day = DateTime.now().minusDays(1).toString("yyyyMMdd");
         byte[] f = Bytes.toBytes("f");
         byte[] sourceCode = Bytes.toBytes("sourceCode");
+        byte[] original_id = Bytes.toBytes("original_id");
+
         Scan scan = new Scan();
         scan.addColumn(f, sourceCode);
         scan.setFilter(new PrefixFilter(Bytes.toBytes(day)));
@@ -256,6 +258,61 @@ public class SparkTests extends ParentTests {
         result.count();
 
         List<String> data = result.groupByKey().map(row -> row._1 + "=" + Lists.newArrayList(row._2).size()).cache().collect();
-        data.forEach(System.out::println);
+        data.forEach(row -> System.out.println("original: " + row));
+
+        TableName analysis = TableName.valueOf("bid_news", "bid_news_analysis");
+        Scan scan1 = new Scan();
+        scan1.addColumn(f, original_id);
+        scan1.addColumn(f, sourceCode);
+        scan1.setFilter(new SingleColumnValueFilter(f, original_id, CompareFilter.CompareOp.EQUAL, new SubstringComparator(day)));
+
+        JavaPairRDD<ImmutableBytesWritable, Result> allRDD = loadData(analysis, scan1);
+        long total1 = allRDD.count();
+        log.info(">>> table {} total {}", analysis.getNameWithNamespaceInclAsString(), total1);
+        JavaPairRDD<String, String> result1 = allRDD.filter(row -> Bytes.toString(row._2.getValue(f, original_id)).startsWith(day))
+                .mapToPair(row -> new Tuple2<>(Bytes.toString(row._2.getValue(f, sourceCode)), Bytes.toString(row._2.getRow())));
+        result1.count();
+
+        List<String> data1 = result.groupByKey().map(row -> row._1 + "=" + Lists.newArrayList(row._2).size()).cache().collect();
+        data1.forEach(row -> System.out.println("analysis: " + row));
+    }
+
+    @Test
+    public void testCountOriginalMoney() throws Exception {
+        TableName original = TableName.valueOf("bid_news", "bid_news_original");
+        TableName analysis = TableName.valueOf("bid_news", "bid_news_analysis");
+        byte[] f = Bytes.toBytes("f");
+        byte[] budget = Bytes.toBytes("budget");
+        byte[] total_bid_money = Bytes.toBytes("total_bid_money");
+
+        JavaPairRDD<ImmutableBytesWritable, Result> originalBudgetRDD = loadData(original, new Scan().addColumn(f, budget));
+        JavaRDD<String> rdd1 = originalBudgetRDD
+                .filter(row -> StringUtils.isNotBlank(Bytes.toString(row._2.getValue(f, budget))))
+                .map(row -> Bytes.toString(row._2.getValue(f, budget)));
+        long count1 = rdd1.count();
+        rdd1.distinct().coalesce(1).saveAsTextFile("data/original_budget");
+
+        JavaPairRDD<ImmutableBytesWritable, Result> originalTotalBidMoneyRDD = loadData(original, new Scan().addColumn(f, total_bid_money));
+        JavaRDD<String> rdd2 = originalTotalBidMoneyRDD
+                .filter(row -> StringUtils.isNotBlank(Bytes.toString(row._2.getValue(f, total_bid_money))))
+                .map(row -> Bytes.toString(row._2.getValue(f, total_bid_money)));
+        long count2 = rdd2.count();
+        rdd2.distinct().coalesce(1).saveAsTextFile("data/original_total_bid_money");
+
+        JavaPairRDD<ImmutableBytesWritable, Result> analysisBudgetRDD = loadData(analysis, new Scan().addColumn(f, budget));
+        JavaRDD<String> rdd3 = analysisBudgetRDD
+                .filter(row -> StringUtils.isNotBlank(Bytes.toString(row._2.getValue(f, budget))))
+                .map(row -> Bytes.toString(row._2.getValue(f, budget)));
+        long count3 = rdd3.count();
+        rdd3.distinct().coalesce(1).saveAsTextFile("data/analysis_budget");
+
+        JavaPairRDD<ImmutableBytesWritable, Result> analysisTotalBidMoneyRDD = loadData(analysis, new Scan().addColumn(f, total_bid_money));
+        JavaRDD<String> rdd4 = analysisTotalBidMoneyRDD
+                .filter(row -> StringUtils.isNotBlank(Bytes.toString(row._2.getValue(f, total_bid_money))))
+                .map(row -> Bytes.toString(row._2.getValue(f, total_bid_money)));
+        long count4 = rdd4.count();
+        rdd4.distinct().coalesce(1).saveAsTextFile("data/analysis_total_bid_money");
+
+        log.info(">>> original budget {}, total bid money {}, analysis budget {}, total bid money {}", count1, count2, count3, count4);
     }
 }

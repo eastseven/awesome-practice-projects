@@ -1,0 +1,7 @@
+logging:
+  level:
+    cn.eastseven: debug
+spring:
+  data:
+    mongodb:
+      uri: mongodb://test:123456@localhost/test

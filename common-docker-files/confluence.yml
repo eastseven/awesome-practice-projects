@@ -1,8 +1,0 @@
-version: '2'
-
-services:
-  app:
-    container_name: confluence
-    image: atlassian/confluence-server
-    ports:
-      - 8090:8090
