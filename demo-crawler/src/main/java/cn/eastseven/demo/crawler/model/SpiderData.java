@@ -5,10 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -18,7 +16,8 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "spider_data")
+@Entity
+@Table(name = "spider_data")
 public class SpiderData {
 
     @Id
@@ -26,11 +25,15 @@ public class SpiderData {
 
     private String title;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
     private String content;
 
-    @DBRef
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "config_id")
     private SpiderConfig config;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createTime = new Date();
 }

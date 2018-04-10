@@ -5,6 +5,7 @@ import cn.eastseven.demo.crawler.model.SpiderData;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.safety.Whitelist;
@@ -55,6 +56,7 @@ public class HtmlPageProcessor implements PageProcessor {
                 Elements elements = page.getHtml().getDocument().body().select(config.getTargetElement());
                 String html = Jsoup.clean(elements.html(), Whitelist.basicWithImages());
                 data.setContent(StringUtils.strip(html));
+                data.setCreateTime(DateTime.now().toDate());
 
                 log.debug("\n{}", JSON.toJSONString(data, true));
 
