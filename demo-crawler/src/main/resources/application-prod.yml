@@ -1,0 +1,17 @@
+logging:
+  level:
+    cn.eastseven: info
+  file: logs/prod.log
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/***?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true
+    username: ***
+    password: ***
+  jpa:
+    hibernate:
+      ddl-auto: update
+swagger:
+  ui-config:
+    json-editor: true
+  exclude-path: /error
