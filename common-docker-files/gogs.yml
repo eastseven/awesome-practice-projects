@@ -1,0 +1,24 @@
+version: '2'
+services:
+  app:
+    image: gogs/gogs
+    container_name: gogs-app
+    ports:
+      - "10022:22"
+      - "10080:3000"
+    volumes:
+      - ./target/gogs-data:/data
+    links:
+      - mysql:mysql
+  mysql:
+    image: mariadb
+    container_name: gogs-db
+    ports:
+      - 13306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=123456
+      - MYSQL_DATABASE=gogs
+      - MYSQL_USER=gogs
+      - MYSQL_PASSWORD=123456
+    volumes:
+      - ./target/gogs-db:/var/lib/mysql
