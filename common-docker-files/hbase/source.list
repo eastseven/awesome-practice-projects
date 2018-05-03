@@ -1,0 +1,10 @@
+deb http://mirrors.163.com/ubuntu/ zesty main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ zesty-security main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ zesty-updates main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ zesty-proposed main restricted universe multiverse
+deb http://mirrors.163.com/ubuntu/ zesty-backports main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ zesty main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ zesty-security main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ zesty-updates main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ zesty-proposed main restricted universe multiverse
+deb-src http://mirrors.163.com/ubuntu/ zesty-backports main restricted universe multiverse

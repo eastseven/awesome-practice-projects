@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+  postgresql:
+    container_name: confluence-db
+    image: sameersbn/postgresql:9.6-2
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - PG_PASSWORD=123456
+      - DB_USER=confluence
+      - DB_PASS=confluence
+      - DB_NAME=confluence
+    volumes:
+      - ./target/confluence-db:/var/lib/postgresql
+  confluence:
+    image: atlassian/confluence-server
+    container_name: confluence-server
+    depends_on:
+      - postgresql
+    links:
+      - postgresql:postgresql
+    ports:
+      - 8090:8090
+      - 8091:8091
+    volumes:
+      - ./target/confluence:/var/atlassian/application-data/confluence

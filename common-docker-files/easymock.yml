@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  mongodb:
+    image: mongo:3.4
+    volumes:
+      - type: bind
+        source: ./target/data/db # 数据库文件存放地址，根据需要修改为本地地址
+        target: /data/db
+  redis:
+    image: redis:4.0.6
+    command: redis-server --appendonly yes
+    volumes:
+      - type: bind
+        source: ./target/data/redis # redis 数据文件存放地址，根据需要修改为本地地址
+        target: /data
+  web:
+    image: easymock/easymock:1.5.1
+    command: /bin/bash -c "npm start"
+    links:
+      - mongodb:mongodb
+    ports:
+      - 7300:7300
+    volumes:
+      - type: bind 
+        source: ./target/logs # 日志地址，根据需要修改为本地地址
+        target: /home/easy-mock/easy-mock/logs

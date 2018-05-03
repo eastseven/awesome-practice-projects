@@ -1,0 +1,27 @@
+# https://yq.aliyun.com/articles/57953
+# 使用Docker Compose部署基于Sentinel的高可用Redis集群
+version: '2'
+
+services:
+    master:
+      image: redis:3
+      ports:
+        - '6379'
+    slave:
+      image: redis:3
+      command: redis-server --slaveof redis-master 6379
+      links:
+        - master:redis-master
+      ports:
+        - '6379'
+    sentinel:
+      build: sentinel
+      ports:
+        - '6379'
+        - '26379'
+      environment:
+        - SENTINEL_DOWN_AFTER=5000
+        - SENTINEL_FAILOVER=5000    
+      links:
+        - master:redis-master
+        - slave
