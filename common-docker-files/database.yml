@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  mariadb:
+    image: 'bitnami/mariadb:latest'
+    environment:
+      - MARIADB_ROOT_PASSWORD=123456
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./target/mariadb:/bitnami
+  mongodb:
+    image: 'bitnami/mongodb:latest'
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGODB_ROOT_PASSWORD=123456
+      - MONGODB_USERNAME=test
+      - MONGODB_PASSWORD=123456
+      - MONGODB_DATABASE=test
+    volumes:
+      - ./target/mongodb:/bitnami
+  redis:
+    image: 'bitnami/redis:latest'
+    environment:
+      - REDIS_PASSWORD=123456
+      - REDIS_EXTRA_FLAGS=--maxmemory 100mb
+      - ALLOW_EMPTY_PASSWORD=no
+    ports:
+      - '6379:6379'
+    volumes:
+      - ./target/redis:/bitnami
