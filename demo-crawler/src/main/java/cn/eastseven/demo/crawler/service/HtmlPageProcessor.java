@@ -3,6 +3,7 @@ package cn.eastseven.demo.crawler.service;
 import cn.eastseven.demo.crawler.model.SpiderConfig;
 import cn.eastseven.demo.crawler.model.SpiderData;
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -17,6 +18,7 @@ import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.processor.PageProcessor;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -50,17 +52,31 @@ public class HtmlPageProcessor implements PageProcessor {
         if (page.getRequest() != null && page.getRequest().getExtra(SpiderData.class.getName()) != null) {
             SpiderData data = (SpiderData) page.getRequest().getExtra(SpiderData.class.getName());
             SpiderConfig config = data.getConfig();
+
+            Set<String> keywords = Sets.newHashSet(config.getKeywords().split(" "));
+
             final Pattern pattern = Pattern.compile(config.getRegExp());
             String url = page.getUrl().toString();
             if (pattern.matcher(url).find()) {
                 Elements elements = page.getHtml().getDocument().body().select(config.getTargetElement());
                 String html = Jsoup.clean(elements.html(), Whitelist.basicWithImages());
-                data.setContent(StringUtils.strip(html));
-                data.setCreateTime(DateTime.now().toDate());
 
-                log.debug("\n{}", JSON.toJSONString(data, true));
+                boolean bln = false;
+                for (String keyword : keywords) {
+                    if (StringUtils.contains(html, keyword)) {
+                        bln = true;
+                        html = StringUtils.replaceAll(html, keyword, "<div style='color: red;'>"+keyword+"</div>");
+                    }
+                }
 
-                page.getResultItems().put(data.getClass().getName(), data);
+                if (bln) {
+                    data.setContent(StringUtils.strip(html));
+                    data.setCreateTime(DateTime.now().toDate());
+
+                    log.debug("\n{}", JSON.toJSONString(data, true));
+
+                    page.getResultItems().put(data.getClass().getName(), data);
+                }
             }
         }
     }

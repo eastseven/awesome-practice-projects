@@ -4,6 +4,7 @@ services:
   redis:
     restart: always
     image: sameersbn/redis:latest
+    container_name: gitlab-redis
     command:
     - --loglevel warning
     volumes:
@@ -12,6 +13,7 @@ services:
   postgresql:
     restart: always
     image: sameersbn/postgresql:9.6-2
+    container_name: gitlab-postgresql
     volumes:
       - ./target/gitlab/postgresql:/var/lib/postgresql
     environment:
@@ -21,7 +23,8 @@ services:
     - DB_EXTENSION=pg_trgm
   gitlab:
     restart: always
-    image: sameersbn/gitlab:9.0.2
+    image: sameersbn/gitlab:10.7.2
+    container_name: gitlab
     depends_on:
     - redis
     - postgresql
@@ -49,7 +52,7 @@ services:
     - GITLAB_HTTPS=false
     - SSL_SELF_SIGNED=false
 
-    - GITLAB_HOST=192.168.50.43
+    - GITLAB_HOST=localhost
     - GITLAB_PORT=10080
     - GITLAB_SSH_PORT=10022
     - GITLAB_SECRETS_DB_KEY_BASE=e10adc3949ba59abbe56e057f20f883e

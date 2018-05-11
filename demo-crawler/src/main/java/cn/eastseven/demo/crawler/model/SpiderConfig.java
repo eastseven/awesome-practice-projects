@@ -38,4 +38,7 @@ public class SpiderConfig {
      */
     @ApiModelProperty("目标页面URL正则表达式")
     private String regExp;
+
+    @ApiModelProperty("关键字，以空格分隔")
+    private String keywords;
 }

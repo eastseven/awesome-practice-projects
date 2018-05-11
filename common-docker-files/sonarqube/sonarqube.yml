@@ -2,18 +2,15 @@ version: "2"
 
 services:
   mysql:
-    image: mysql
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    ports:
-      - 3308:3306
+    container_name: sonar-db
+    image: bitnami/mysql:5.7
     environment:
       - MYSQL_ROOT_PASSWORD=sonar
       - MYSQL_DATABASE=sonar
       - MYSQL_USER=sonar
       - MYSQL_PASSWORD=sonar
-    volumes:
-      - ../target/sonarqube-mysql:/var/lib/mysql
   sonarqube:
+    container_name: sonar
     depends_on:
       - mysql
     links:
@@ -34,4 +31,3 @@ services:
       - ../target/sonarqube-data/data:/opt/sonarqube/data
       - ../target/sonarqube-data/extensions:/opt/sonarqube/extensions
       - ../target/sonarqube-data/bundled-plugins:/opt/sonarqube/lib/bundled-plugins
-

@@ -6,10 +6,12 @@ import cn.eastseven.demo.crawler.repository.SpiderConfigRepository;
 import cn.eastseven.demo.crawler.service.HtmlPageProcessor;
 import cn.eastseven.demo.crawler.service.SpiderService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
+import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 
 /**
  * @author eastseven
@@ -39,9 +41,12 @@ public class SpiderServiceImpl implements SpiderService {
     }
 
     void start(SpiderConfig config) {
+        if (StringUtils.isBlank(config.getKeywords())) {
+            log.error("keywords 不能为空", config);
+        }
         Request request = new Request(config.getUrl());
         request.putExtra(config.getClass().getName(), config);
-        Spider.create(pageProcessor).addRequest(request).addPipeline(spiderDataPipeline).run();
+        Spider.create(pageProcessor).setScheduler(new FileCacheQueueScheduler("urls")).addRequest(request).addPipeline(spiderDataPipeline).run();
     }
 
     @Override
@@ -49,7 +54,9 @@ public class SpiderServiceImpl implements SpiderService {
         boolean exists = repository.existsById(config.getUrl());
         if (!exists) {
             repository.save(config);
-            new Thread(() -> {start(config);}).start();
+            new Thread(() -> {
+                start(config);
+            }).start();
         }
 
         return config;
