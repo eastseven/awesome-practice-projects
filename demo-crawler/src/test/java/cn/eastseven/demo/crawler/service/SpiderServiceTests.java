@@ -29,6 +29,7 @@ public class SpiderServiceTests extends DemoCrawlerApplicationTests {
                     .url("http://news.163.com/")
                     .targetElement("#endText")
                     .regExp("http://news.163.com/\\d+/\\d+/\\d+/\\w+.html")
+                    .keywords("习近平 市民")
                     .build();
             dao.save(config);
         }

@@ -21,7 +21,7 @@ public class SpiderDataPipeline implements Pipeline {
     @Override
     public void process(ResultItems resultItems, Task task) {
         SpiderData data = resultItems.get(SpiderData.class.getName());
-        if (data != null) {
+        if (data != null && !repository.existsById(data.getUrl())) {
             repository.save(data);
         }
     }

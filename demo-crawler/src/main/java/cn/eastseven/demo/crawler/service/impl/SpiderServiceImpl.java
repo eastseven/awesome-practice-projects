@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import us.codecraft.webmagic.Request;
 import us.codecraft.webmagic.Spider;
-import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 
 /**
  * @author eastseven
@@ -46,7 +45,7 @@ public class SpiderServiceImpl implements SpiderService {
         }
         Request request = new Request(config.getUrl());
         request.putExtra(config.getClass().getName(), config);
-        Spider.create(pageProcessor).setScheduler(new FileCacheQueueScheduler("urls")).addRequest(request).addPipeline(spiderDataPipeline).run();
+        Spider.create(pageProcessor).addRequest(request).addPipeline(spiderDataPipeline).run();
     }
 
     @Override

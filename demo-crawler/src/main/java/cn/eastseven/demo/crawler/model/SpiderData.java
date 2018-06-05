@@ -21,6 +21,7 @@ import java.util.Date;
 public class SpiderData {
 
     @Id
+    @Column(length = 127)
     private String url;
 
     private String title;
