@@ -1,0 +1,15 @@
+logging:
+  level:
+    cn.eastseven.activiti: debug
+    org.activiti: info
+spring:
+  datasource:
+#    driver-class-name: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://g.dageek.cn:3306/dageekdev?characterEncoding=UTF-8&useSSL=true
+#    username: dageekdev
+#    password: dageekdev
+    hikari:
+      driver-class-name: com.mysql.jdbc.Driver
+      jdbc-url: jdbc:mysql://g.dageek.cn:3306/dageekdev?characterEncoding=UTF-8
+      username: dageekdev
+      password: dageekdev

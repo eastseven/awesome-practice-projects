@@ -4,7 +4,7 @@ services:
     image: cptactionhank/atlassian-jira:latest
     container_name: jira-data
     ports:
-      - "18080:8080"
+      - "8080:8080"
     volumes:
       - ./target/jira/data:/var/atlassian/jira
       - ./target/jira/logs:/opt/atlassian/jira/logs
@@ -12,6 +12,7 @@ services:
       - mysql:mysql
   mysql:
     image: mariadb
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     container_name: jira-db
     ports:
       - 13306:3306
