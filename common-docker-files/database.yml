@@ -2,7 +2,9 @@ version: '2'
 
 services:
   mariadb:
+    container_name: db-mariadb
     image: 'bitnami/mariadb:latest'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
       - MARIADB_ROOT_PASSWORD=123456
     ports:
@@ -10,6 +12,7 @@ services:
     volumes:
       - ./target/mariadb:/bitnami
   mongodb:
+    container_name: db-mongodb
     image: 'bitnami/mongodb:latest'
     ports:
       - "27017:27017"
@@ -21,6 +24,7 @@ services:
     volumes:
       - ./target/mongodb:/bitnami
   redis:
+    container_name: db-redis
     image: 'bitnami/redis:latest'
     environment:
       - REDIS_PASSWORD=123456
