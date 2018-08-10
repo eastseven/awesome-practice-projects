@@ -3,6 +3,6 @@ version: '2'
 services:
   oracle10g:
     image: 'dkfi/docker-oracle-xe-10g'
-    contenter_name: oracle-10g-xe
+    container_name: oracle-10g-xe
     ports:
     - '1521:1521'
